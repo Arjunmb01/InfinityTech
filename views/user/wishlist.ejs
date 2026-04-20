@@ -1,0 +1,176 @@
+<%- include("partials/header") %>
+
+    <div class="bg-bg-primary min-h-screen py-16 transition-colors duration-300">
+        <div class="container mx-auto px-6">
+            <h1 class="text-4xl font-black text-text-primary mb-12 tracking-tighter uppercase text-center">Your <span class="text-accent-vivid">Wishlist</span></h1>
+
+            <% if (wishlistItems.length===0) { %>
+                <div class="max-w-md mx-auto text-center py-20 glass-card p-10 border border-border-color bg-bg-secondary">
+                    <div
+                        class="w-20 h-20 bg-bg-secondary border border-border-color rounded-full flex items-center justify-center mx-auto mb-6 text-text-muted shadow-glow">
+                        <i class="far fa-heart text-3xl opacity-50"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-text-primary mb-2 uppercase tracking-tighter">Your wishlist is empty</h3>
+                    <p class="text-text-muted text-[10px] font-black uppercase tracking-widest mb-8">Save items you want to see again later.</p>
+                    <a href="/shop"
+                        class="btn-premium px-10 py-4 inline-block bg-accent-vivid hover:bg-accent-vivid text-white shadow-glow text-[10px] font-black uppercase tracking-widest">Start
+                        Shopping</a>
+                </div>
+                <% } else { %>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        <% wishlistItems.forEach((item, index)=> { %>
+                            <div class="glass-card group h-full flex flex-col animate-fade-in border border-border-color bg-bg-secondary hover:border-accent-vivid/30 overflow-hidden rounded-2xl"
+                                style="animation-delay: <%= index * 0.05 %>s">
+                                <div
+                                    class="relative bg-bg-secondary aspect-[4/3] flex items-center justify-center p-6 overflow-hidden">
+                                    <a href="/product/<%= item.product._id %>"
+                                        class="w-full h-full flex items-center justify-center">
+                                        <img src="<%= item.product.images && item.product.images[0] ? item.product.images[0].url : '/images/placeholder.png' %>" alt="<%= item.product.name %>"
+                                            class="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105 filter brightness-95">
+                                    </a>
+
+                                    <button onclick="removeFromWishlist('<%= item.product._id %>', this)"
+                                        class="absolute top-4 right-4 w-10 h-10 bg-bg-primary/80 backdrop-blur-md rounded-full flex items-center justify-center text-text-muted hover:text-text-primary border border-border-color hover:border-text-muted transition-all"
+                                        title="Remove from Wishlist">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                </div>
+
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <a href="/product/<%= item.product._id %>" class="block mb-2">
+                                        <h3
+                                            class="font-black text-text-primary uppercase tracking-tight group-hover:text-accent-vivid transition-colors truncate">
+                                            <%= item.product.name %>
+                                        </h3>
+                                    </a>
+
+                                    <div class="mt-auto pt-6 flex flex-col gap-4">
+                                        <div class="flex flex-col">
+                                            <span class="text-xl font-black text-text-primary tracking-widest">₹<%= item.offerDetails.finalPrice.toLocaleString('en-IN') %></span>
+                                            <% if (item.offerDetails.discountPercentage > 0) { %>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] text-text-muted line-through opacity-50">₹<%= item.product.price.toLocaleString('en-IN') %></span>
+                                                    <span class="text-[10px] text-accent-vivid font-bold uppercase tracking-tighter"><%= Math.round(item.offerDetails.discountPercentage) %>% OFF</span>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                        <button onclick="addToCart('<%= item.product._id %>', this)"
+                                            class="w-full py-4 bg-bg-secondary border border-border-color text-accent-vivid text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-accent-vivid hover:text-white transition-all shadow-glow">
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+        </div>
+    </div>
+
+    <%- include("partials/footer") %>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            // SweetAlert Theme Override for Minimal Design
+            const swalCustomClass = {
+                popup: 'bg-onyx-900 rounded-2xl shadow-xl border border-white/10',
+                title: 'text-white font-black uppercase tracking-tighter',
+                htmlContainer: 'text-slate-400',
+                confirmButton: 'bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg border-none shadow-none',
+                cancelButton: 'text-slate-500 hover:text-white font-medium px-4 py-2'
+            };
+
+            // Add to Cart Logic (Moves from Wishlist to Cart)
+            async function addToCart(productId, btnElement) {
+                try {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId, quantity: 1 })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        // 1. Successfully added to cart, now remove from wishlist
+                        const wishRes = await fetch('/api/wishlist/toggle', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId })
+                        });
+                        const wishData = await wishRes.json();
+
+                        Swal.fire({
+                            toast: true, position: 'bottom-end', icon: 'success', title: 'Moved to cart', showConfirmButton: false, timer: 2000
+                        });
+
+                        // Update Cart Badge
+                        const cartBadge = document.getElementById('cart-count');
+                        if (cartBadge && data.cartCount) {
+                            cartBadge.innerText = data.cartCount;
+                            cartBadge.classList.remove('hidden');
+                        }
+
+                        // Update Wishlist Badge & Remove Item from UI
+                        if (wishData.success) {
+                            const wishBadge = document.getElementById('wishlist-count');
+                            if (wishBadge && wishData.wishlistCount !== undefined) {
+                                wishBadge.innerText = wishData.wishlistCount;
+                                if (wishData.wishlistCount === 0) setTimeout(() => location.reload(), 500); // Reload if empty
+                            }
+
+                            // Remove Card
+                            if (btnElement) {
+                                const card = btnElement.closest('.card-luxury');
+                                if (card) {
+                                    card.style.opacity = '0';
+                                    setTimeout(() => card.remove(), 300);
+                                }
+                            }
+                        }
+
+                    } else {
+                        if (data.message === 'Please login to continue') window.location.href = '/login';
+                        else Swal.fire({ toast: true, position: 'bottom-end', icon: 'error', title: data.message || 'Error', timer: 2000 });
+                    }
+                } catch (error) { console.error(error); }
+            }
+
+            // Remove from Wishlist (using toggle endpoint which handles removal)
+            async function removeFromWishlist(productId, btnElement) {
+                Swal.fire({
+                    title: 'Remove item?',
+                    text: "Remove this item from your wishlist?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Remove',
+                    customClass: swalCustomClass
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch('/api/wishlist/toggle', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ productId })
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                // Animate and remove
+                                const card = btnElement.closest('.card-luxury');
+                                card.style.opacity = '0';
+                                setTimeout(() => card.remove(), 300);
+
+                                Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Removed from wishlist', showConfirmButton: false, timer: 2000 });
+
+                                // Update count if 0 refresh to show empty state
+                                const countBadge = document.getElementById('wishlist-count');
+                                if (countBadge && data.wishlistCount !== undefined) {
+                                    countBadge.innerText = data.wishlistCount;
+                                    if (data.wishlistCount === 0) setTimeout(() => location.reload(), 500);
+                                }
+                            } else {
+                                Swal.fire({ toast: true, position: 'bottom-end', icon: 'error', title: data.message || 'Error', timer: 2000 });
+                            }
+                        } catch (e) { console.error(e); }
+                    }
+                });
+            }
+        </script>

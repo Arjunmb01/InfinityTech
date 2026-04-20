@@ -1,0 +1,236 @@
+<%- include('./partials/adminHeader.ejs') %>
+
+<div class="flex min-h-screen gradient-bg animate-gradient">
+    <%- include('./partials/adminSidebar.ejs') %>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto" style="margin-left: var(--sidebar-width, 16rem);">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header Section -->
+            <div class="flex justify-between items-center mb-8 animate-fade-in-up">
+                <h3 class="text-3xl font-extrabold bg-gradient-to-r from-[#d4af37] to-[#f9e076] bg-clip-text text-transparent tracking-tight">Add New Category</h3>
+                <a href="/admin/categories" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f9e076] text-white transition-all duration-300 transform hover:scale-105 group glass-effect-dark">
+                    <svg class="w-5 h-5 mr-2 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                    </svg>
+                    Back to Categories
+                </a>
+            </div>
+
+            <!-- Form Section -->
+            <div class="glass-effect-dark rounded-xl p-8 max-w-4xl mx-auto shadow-xl border border-white/10 animate-fade-in-up animation-delay-200">
+                <form id="categoryForm" class="space-y-8">
+                    <!-- Basic Information Section -->
+                    <div class="space-y-6">
+                        <h4 class="text-xl font-bold text-[var(--text-color)] border-b border-white/10 pb-2">Basic Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-[var(--text-color)] mb-2">Category Name</label>
+                                <input type="text" id="name" name="name" required
+                                       class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37] focus:ring-2 focus:ring-[#d4af37]/20 transition-all duration-300"
+                                       placeholder="e.g., Laptops">
+                            </div>
+                            <div>
+                                <label for="parent" class="block text-sm font-medium text-[var(--text-color)] mb-2">Parent Category</label>
+                                <select id="parent" name="parent"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37] focus:ring-2 focus:ring-[#d4af37]/20 transition-all duration-300">
+                                    <option value="">None (Top Level)</option>
+                                    <% if (categories && categories.length > 0) { %>
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat._id %>"><%= cat.name %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-[var(--text-color)] mb-2">Description</label>
+                            <textarea id="description" name="description" rows="3"
+                                      class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37] focus:ring-2 focus:ring-[#d4af37]/20 transition-all duration-300"
+                                      placeholder="Brief description of the category"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="categoryOffer" class="block text-sm font-medium text-[var(--text-color)] mb-2">Category Offer (%)</label>
+                                <input type="number" id="categoryOffer" name="categoryOffer" min="0" max="100" value="0"
+                                       class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37] focus:ring-2 focus:ring-[#d4af37]/20 transition-all duration-300">
+                            </div>
+                            <div>
+                                <label for="sortOrder" class="block text-sm font-medium text-[var(--text-color)] mb-2">Sort Order</label>
+                                <input type="number" id="sortOrder" name="sortOrder" value="0"
+                                       class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37] focus:ring-2 focus:ring-[#d4af37]/20 transition-all duration-300">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters Section -->
+                    <div class="space-y-6 pt-6">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                            <h4 class="text-xl font-bold text-[var(--text-color)]">Dynamic Filters</h4>
+                            <button type="button" id="addFilterBtn"
+                                    class="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors">
+                                + Add Filter
+                            </button>
+                        </div>
+                        <div id="filtersContainer" class="space-y-4">
+                            <!-- Filters will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- SEO Section -->
+                    <div class="space-y-6 pt-6">
+                        <h4 class="text-xl font-bold text-[var(--text-color)] border-b border-white/10 pb-2">SEO Metadata</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="seoTitle" class="block text-sm font-medium text-gray-400 mb-1">Meta Title</label>
+                                <input type="text" id="seoTitle" name="seoTitle"
+                                       class="w-full px-4 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37]">
+                            </div>
+                            <div>
+                                <label for="seoDescription" class="block text-sm font-medium text-gray-400 mb-1">Meta Description</label>
+                                <textarea id="seoDescription" name="seoDescription" rows="2"
+                                          class="w-full px-4 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37]"></textarea>
+                            </div>
+                            <div>
+                                <label for="seoKeywords" class="block text-sm font-medium text-gray-400 mb-1">Keywords (Comma separated)</label>
+                                <input type="text" id="seoKeywords" name="seoKeywords"
+                                       class="w-full px-4 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-[var(--text-color)] focus:border-[#d4af37]"
+                                       placeholder="electronics, laptops, tech">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-8">
+                        <button type="submit" 
+                                class="inline-flex items-center px-8 py-3 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f9e076] text-[#020617] font-bold transition-all duration-300 transform hover:scale-105 group">
+                            <svg class="w-5 h-5 mr-2 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Create Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filtersContainer = document.getElementById('filtersContainer');
+        const addFilterBtn = document.getElementById('addFilterBtn');
+
+        // Function to add a filter row
+        function addFilterRow() {
+            const filterId = Date.now();
+            const row = document.createElement('div');
+            row.className = 'glass-effect-dark p-4 rounded-lg border border-white/5 relative filter-row';
+            row.innerHTML = `
+                <button type="button" class="absolute top-2 right-2 text-red-500 hover:text-red-400 remove-filter" title="Remove">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Filter Name</label>
+                        <input type="text" class="filter-name w-full px-3 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-sm text-[var(--text-color)]" placeholder="e.g., RAM">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Type</label>
+                        <select class="filter-type w-full px-3 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-sm text-[var(--text-color)]">
+                            <option value="checkbox">Checkbox</option>
+                            <option value="radio">Radio</option>
+                            <option value="range">Range</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Options (Comma separated)</label>
+                        <input type="text" class="filter-options w-full px-3 py-2 rounded bg-[var(--content-bg)] border border-white/10 text-sm text-[var(--text-color)]" placeholder="8GB, 16GB, 32GB">
+                    </div>
+                </div>
+            `;
+            filtersContainer.appendChild(row);
+
+            row.querySelector('.remove-filter').addEventListener('click', () => row.remove());
+        }
+
+        addFilterBtn.addEventListener('click', addFilterRow);
+
+        // Form submission
+        document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Collect filters
+            const filters = [];
+            document.querySelectorAll('.filter-row').forEach(row => {
+                const name = row.querySelector('.filter-name').value.trim();
+                const type = row.querySelector('.filter-type').value;
+                const optionsRaw = row.querySelector('.filter-options').value;
+                const options = optionsRaw 
+                    ? optionsRaw.split(',').map(o => o.trim()).filter(o => o !== '') 
+                    : [];
+
+                if (name) {
+                    filters.push({ name, type, options });
+                }
+            });
+
+            // Collect SEO
+            const seo = {
+                title: document.getElementById('seoTitle').value.trim(),
+                description: document.getElementById('seoDescription').value.trim(),
+                keywords: document.getElementById('seoKeywords').value.split(',').map(k => k.trim()).filter(k => k !== '')
+            };
+
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                parent: document.getElementById('parent').value || null,
+                categoryOffer: parseInt(document.getElementById('categoryOffer').value) || 0,
+                sortOrder: parseInt(document.getElementById('sortOrder').value) || 0,
+                filters: filters,
+                seo: seo
+            };
+
+            try {
+                const response = await fetch('/admin/addCategory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to add category');
+                }
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Category created successfully!',
+                    background: 'var(--primary-bg)',
+                    color: 'var(--text-color)',
+                    confirmButtonColor: '#d4af37'
+                });
+
+                window.location.href = '/admin/categories';
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message,
+                    background: 'var(--primary-bg)',
+                    color: 'var(--text-color)',
+                    confirmButtonColor: '#d4af37'
+                });
+            }
+        });
+    });
+</script>
+
+<%- include('./partials/adminFooter.ejs') %>

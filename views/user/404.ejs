@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Signal Lost | InfinityTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        onyx: {
+                            950: '#050505',
+                            900: '#121212',
+                            800: '#1a1a1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
+        h1, h2 { font-family: 'Outfit', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+        }
+        .shadow-glow {
+            box-shadow: 0 0 40px -10px rgba(79, 70, 229, 0.3);
+        }
+        .glitch {
+            position: relative;
+            animation: glitch 1s linear infinite;
+        }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px, 0) skew(0deg); }
+            4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+            62% { transform: translate(0, 0) skew(5deg); }
+        }
+        .glitch:before, .glitch:after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+        }
+        .glitch:before {
+            animation: glitch-top 1s linear infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+        }
+        @keyframes glitch-top {
+            2%, 64% { transform: translate(2px, -2px); }
+            4%, 60% { transform: translate(-2px, 2px); }
+            62% { transform: translate(13px, -1px) skew(-13deg); }
+        }
+        .glitch:after {
+            animation: glitch-bottom 1.5s linear infinite;
+            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+        }
+        @keyframes glitch-bottom {
+            2%, 64% { transform: translate(-2px, 0); }
+            4%, 60% { transform: translate(-2px, 0); }
+            62% { transform: translate(-22px, 5px) skew(21deg); }
+        }
+    </style>
+</head>
+<body class="bg-onyx-950 min-h-screen flex items-center justify-center p-6 overflow-hidden">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-indigo-600/10 rounded-full blur-[160px] animate-pulse"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
+    </div>
+
+    <div class="relative z-10 w-full max-w-2xl text-center space-y-12 animate-fade-in">
+        <!-- Error Code -->
+        <div class="relative inline-block">
+            <h1 class="text-[12rem] font-black text-white leading-none glitch tracking-tighter" data-text="404">404</h1>
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 bg-indigo-600 shadow-glow"></div>
+        </div>
+
+        <!-- Message -->
+        <div class="space-y-4">
+            <h2 class="text-4xl font-black text-white uppercase tracking-tighter">Page Not <span class="text-indigo-500">Found</span></h2>
+            <p class="text-slate-500 text-lg max-w-md mx-auto font-medium">
+                Sorry, we couldn't find the page you were looking for.
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="/" class="group flex items-center gap-3 bg-indigo-600 hover:bg-white text-white hover:text-onyx-950 px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all shadow-glow hover:scale-105 active:scale-95">
+                Back to Login
+            </a>
+            <a href="/shop" class="group flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white px-8 py-5 rounded-2xl border border-white/10 text-xs font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95">
+                <i class="fas fa-shopping-bag text-indigo-500"></i>
+                Shop Products
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] pt-8">
+            Infinity Technology &copy; 2026 // Status: <span class="text-indigo-500">Online</span>
+        </p>
+    </div>
+
+    <!-- Decorative Sidebar Text -->
+    <div class="fixed left-10 top-1/2 -translate-y-1/2 [writing-mode:vertical-lr] rotate-180 hidden xl:block">
+        <span class="text-[10px] font-black text-white/5 uppercase tracking-[1em]">ERROR_404_PAGE_NOT_FOUND</span>
+    </div>
+    <div class="fixed right-10 top-1/2 -translate-y-1/2 [writing-mode:vertical-lr] hidden xl:block">
+        <span class="text-[10px] font-black text-white/5 uppercase tracking-[1em]">INFINITY_TECH_PLATFORM_V1.0</span>
+    </div>
+</body>
+</html>

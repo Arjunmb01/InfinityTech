@@ -1,0 +1,255 @@
+<%- include('../partials/header') %>
+
+<div class="bg-bg-primary min-h-screen py-16 transition-colors duration-300">
+    <div class="container mx-auto px-6">
+
+        <!-- Page Header -->
+        <div class="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+                <h1 class="text-5xl font-black text-text-primary tracking-tighter uppercase leading-tight">
+                    Your <span class="text-accent-vivid">Cart</span>
+                </h1>
+                <p class="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mt-3">
+                    Review your items before proceeding.
+                </p>
+            </div>
+            <a href="/shop" class="group inline-flex items-center text-[10px] font-black text-text-muted hover:text-accent-vivid transition-all uppercase tracking-[0.2em] mb-1">
+                <i class="fas fa-arrow-left mr-3 transition-transform group-hover:-translate-x-1"></i>
+                Continue Shopping
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex flex-col lg:flex-row gap-12">
+
+            <!-- Cart Items List -->
+            <div class="flex-1 min-w-0">
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <div class="space-y-6">
+                        <% cartItems.forEach(item => { %>
+                            <div class="glass-card p-8 border-border-color flex flex-col sm:flex-row items-center gap-8 group hover:bg-text-primary/[0.03] transition-all duration-500" data-product-id="<%= item.product._id %>">
+
+                                <!-- Product Image -->
+                                <div class="w-32 h-32 bg-bg-secondary rounded-2xl border border-border-color flex items-center justify-center p-4 flex-shrink-0 group-hover:bg-text-primary/[0.08] transition-all duration-500">
+                                    <img src="<%= item.product.images && item.product.images[0] ? item.product.images[0].url : '/images/placeholder.jpg' %>" alt="<%= item.product.name %>" class="w-full h-full object-contain filter drop-shadow-2xl brightness-90 group-hover:brightness-100 transition-all">
+                                </div>
+
+                                <!-- Details -->
+                                <div class="flex-1 text-center sm:text-left w-full sm:w-auto">
+                                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                                        <div>
+                                            <h3 class="font-black text-text-primary text-xl uppercase tracking-tight mb-2 group-hover:text-accent-vivid transition-colors">
+                                                <%= item.product.name %>
+                                            </h3>
+                                            <div class="flex flex-wrap justify-center sm:justify-start items-center gap-4">
+                                                <div class="text-xs font-black text-accent-vivid tracking-widest font-mono">
+                                                    ₹<%= item.offerDetails.finalPrice.toLocaleString('en-IN') %>
+                                                    <% if (item.offerDetails.discountPercentage > 0) { %>
+                                                        <span class="text-text-muted line-through ml-2 text-[10px]">₹<%= item.offerDetails.basePrice.toLocaleString('en-IN') %></span>
+                                                        <span class="text-emerald-500 text-[9px] font-black ml-2 py-0.5 px-2 bg-emerald-500/10 border border-emerald-500/20 rounded-md uppercase tracking-tighter">
+                                                            <%= item.offerDetails.discountPercentage.toFixed(0) %>% OFFER
+                                                        </span>
+                                                    <% } %>
+                                                </div>
+
+                                                <% if (item.product.stock < 10 && item.product.stock > 0) { %>
+                                                    <span class="text-amber-500 text-[9px] font-black bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 uppercase tracking-widest">
+                                                        LOW STOCK: <%= item.product.stock %> UNITS
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="hidden sm:block text-right">
+                                            <span class="block text-[9px] font-black text-text-muted uppercase tracking-widest mb-1">Item Total</span>
+                                            <span class="font-black text-text-primary text-lg tracking-tighter item-total">₹<%= item.total.toLocaleString('en-IN') %></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions Row -->
+                                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-border-color">
+                                        <!-- Quantity Control -->
+                                        <div class="flex items-center bg-bg-secondary rounded-xl border border-border-color p-1">
+                                            <button class="quantity-btn decrease-btn w-10 h-10 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-text-primary/10 rounded-lg transition-all disabled:opacity-20"
+                                                data-product-id="<%= item.product._id %>" <%= item.quantity <= 1 ? 'disabled' : '' %>>
+                                                <i class="fas fa-minus text-xs"></i>
+                                            </button>
+                                            <span class="w-12 text-center text-xs font-black text-text-primary quantity tracking-widest" data-quantity="<%= item.product._id %>">
+                                                <%= item.quantity %>
+                                            </span>
+                                            <button class="quantity-btn increase-btn w-10 h-10 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-text-primary/10 rounded-lg transition-all disabled:opacity-20"
+                                                data-product-id="<%= item.product._id %>" <%= item.product.stock <= item.quantity ? 'disabled' : '' %>>
+                                                <i class="fas fa-plus text-xs"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Mobile Total & Remove -->
+                                        <div class="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-end">
+                                            <div class="sm:hidden text-left">
+                                                <span class="block text-[8px] font-black text-text-muted uppercase tracking-widest">Total</span>
+                                                <span class="font-black text-text-primary text-base item-total">₹<%= item.total.toLocaleString('en-IN') %></span>
+                                            </div>
+                                            <button class="remove-btn group/btn flex items-center gap-3 text-[9px] font-black text-text-muted hover:text-red-500 transition-all uppercase tracking-widest" data-product-id="<%= item.product._id %>">
+                                                <i class="far fa-trash-alt text-base opacity-50 group-hover/btn:opacity-100 group-hover/btn:scale-110 transition-all"></i>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="glass-card p-20 text-center border-border-color bg-text-primary/[0.01]">
+                        <div class="w-24 h-24 bg-bg-secondary rounded-full flex items-center justify-center mx-auto mb-8 text-text-muted border border-border-color shadow-glow">
+                            <i class="fas fa-shopping-basket text-3xl opacity-20"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-text-primary mb-4 uppercase tracking-tighter">Your Cart is <span class="text-text-muted">Empty</span></h2>
+                        <p class="text-text-muted mb-10 max-w-sm mx-auto text-[11px] font-bold uppercase tracking-widest leading-relaxed">You haven't added anything to your cart yet. Browse our products to find something you like.</p>
+                        <a href="/shop" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest bg-bg-secondary border border-border-color hover:bg-text-primary hover:text-bg-primary inline-flex items-center">
+                            Start Shopping <i class="fas fa-arrow-right ml-3 opacity-50"></i>
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <% if (cartItems.length > 0) { %>
+                        <div class="lg:w-[400px] flex-shrink-0">
+                            <div class="glass-card p-10 border-border-color sticky top-32 bg-bg-primary/40 backdrop-blur-3xl shadow-premium">
+                                <h2 class="text-sm font-black text-text-primary mb-10 uppercase tracking-[0.3em]">Order <span class="text-accent-vivid">Summary</span></h2>
+        
+                                <div class="space-y-5 mb-10">
+                                    <div class="flex justify-between text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                                        <span>Subtotal</span>
+                                        <span class="text-text-primary cart-subtotal">₹<%= cartSubtotal.toLocaleString('en-IN') %></span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                                        <span>Shipping</span>
+                                        <span class="text-accent-vivid cart-shipping font-black">
+                                            <%= shippingCharge === 0 ? 'FREE' : '₹' + shippingCharge.toLocaleString('en-IN') %>
+                                        </span>
+                                    </div>
+                                </div>
+        
+                                <div class="pt-8 border-t border-border-color mb-10">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-text-primary uppercase tracking-[0.2em]">Order Total</span>
+                                        <span class="text-3xl font-black text-accent-vivid tracking-tighter cart-total">₹<%= cartTotal.toLocaleString('en-IN') %></span>
+                                    </div>
+                                    <p class="text-[9px] font-black text-text-muted uppercase tracking-widest">GST (Included)</p>
+                                </div>
+        
+                                <a href="/checkout" class="btn-premium w-full flex justify-center items-center py-5 text-[11px] font-black uppercase tracking-widest bg-accent-vivid hover:bg-accent-vivid text-white border-none shadow-glow">
+                                    Proceed to Checkout
+                                </a>
+        
+                                <div class="mt-8 flex justify-center items-center gap-3 text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">
+                                    <i class="fas fa-lock opacity-50"></i> Secure Checkout
+                                </div>
+                            </div>
+                        </div>
+            <% } %>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    <% if (message && message.content) { %>
+    document.addEventListener('DOMContentLoaded', () => {
+        const type = '<%= message.type %>';
+        Swal.fire({
+            text: '<%= message.content %>',
+            icon: type === 'error' ? 'error' : 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            background: '#0a0a0a',
+            color: '#fff',
+            customClass: {
+                popup: 'glass-card border-white/10 rounded-2xl shadow-2xl',
+            }
+        });
+    });
+    <% } %>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const isIncrease = btn.classList.contains('increase-btn');
+                const productId = btn.dataset.productId;
+                const quantitySpan = document.querySelector(`.quantity[data-quantity="${productId}"]`);
+                let currentQty = parseInt(quantitySpan.textContent);
+                const newQty = isIncrease ? currentQty + 1 : currentQty - 1;
+                if (newQty < 1) return;
+
+                btn.disabled = true;
+                try {
+                    const response = await fetch(`/cart/update/${productId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ quantity: newQty })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        quantitySpan.textContent = newQty;
+                        const itemTotals = btn.closest('.glass-card').querySelectorAll('.item-total');
+                        itemTotals.forEach(el => el.textContent = `₹${data.itemTotal.toLocaleString('en-IN')}`);
+                        document.querySelector('.cart-subtotal').textContent = `₹${data.cartSubtotal.toLocaleString('en-IN')}`;
+                        document.querySelector('.cart-total').textContent = `₹${data.cartTotal.toLocaleString('en-IN')}`;
+                        
+                        const decBtn = btn.closest('.flex').querySelector('.decrease-btn');
+                        if (decBtn) decBtn.disabled = newQty <= 1;
+                        btn.disabled = false;
+                    } else {
+                        Swal.fire({ icon: 'error', text: data.message, toast: true, position: 'top-end', timer: 3000 });
+                        btn.disabled = false;
+                    }
+                } catch (err) { console.error(err); btn.disabled = false; }
+            });
+        });
+
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const productId = btn.dataset.productId;
+                        const result = await Swal.fire({
+                            title: 'REMOVE ITEM?',
+                            text: 'Are you sure you want to remove this item from your cart?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#6366f1',
+                            cancelButtonColor: '#0a0a0a',
+                            confirmButtonText: 'YES, REMOVE',
+                            background: '#0a0a0a',
+                            color: '#fff',
+                            customClass: {
+                                popup: 'glass-card border-white/10 rounded-2xl shadow-2xl',
+                                confirmButton: 'btn-premium px-6 py-2 text-[10px] uppercase font-black tracking-widest',
+                                cancelButton: 'text-[10px] uppercase font-black tracking-widest ml-4'
+                            }
+                        });
+
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/cart/remove/${productId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+                        const data = await response.json();
+                        if (data.success) {
+                            const row = btn.closest('.glass-card');
+                            row.style.opacity = '0';
+                            row.style.transform = 'scale(0.95)';
+                            setTimeout(() => { window.location.reload(); }, 300);
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    } catch (err) { console.error(err); }
+                }
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

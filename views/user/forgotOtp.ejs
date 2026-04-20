@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - InfinityTech</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/minimal-theme.css">
+</head>
+
+<body class="bg-onyx-950 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-indigo-900/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="flex min-h-screen items-center justify-center p-6 relative z-10">
+        <!-- Auth Card -->
+        <div class="w-full max-w-md glass-card p-10 border-white/5 animate-fade-in">
+            <div class="text-center mb-10">
+                <a href="/" class="inline-block mb-8 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
+                            <i class="fas fa-microchip text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-black text-white tracking-tighter uppercase tracking-[-0.05em]">Infinity<span class="text-indigo-500">Tech</span></span>
+                    </div>
+                </a>
+                <h1 class="text-3xl font-black text-white tracking-tighter uppercase mb-2">Recovery Verification</h1>
+                <p class="text-slate-500 text-sm font-medium">Verify the recovery signal for: <span class="text-indigo-400"><%= email %></span></p>
+            </div>
+
+            <form id="verifyOTPForm" class="space-y-8">
+                <input type="hidden" id="email" value="<%= email %>">
+                
+                <div>
+                    <label for="otp" class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 text-center">Enter 6-Digit Recovery Key</label>
+                    <input type="text" id="otp" name="otp" maxlength="6" required
+                        class="w-full bg-onyx-950/50 border border-white/10 rounded-2xl px-5 py-6 text-4xl text-white text-center font-black tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/30 transition-all placeholder-slate-800"
+                        placeholder="000000">
+                    <p id="otpError" class="hidden text-red-500 text-[10px] font-black uppercase tracking-widest mt-4 text-center px-1"></p>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="btn-premium w-full py-5 text-xs font-black uppercase tracking-[0.2em] shadow-glow">
+                        Authenticate Key
+                    </button>
+                </div>
+            </form>
+
+                <div class="flex flex-col items-center gap-8 mb-8">
+                    <div class="flex items-center gap-4 bg-white/5 px-6 py-3 rounded-full border border-white/5">
+                        <div class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></div>
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
+                            Key Expires In: <span id="timer" class="text-white font-mono">01:00</span>
+                        </span>
+                    </div>
+                    
+                    <button type="button" id="resendButton" disabled
+                        class="text-[10px] font-black text-indigo-500 hover:text-white disabled:text-slate-800 disabled:cursor-not-allowed uppercase tracking-widest transition-all">
+                        Resend Recovery Signal
+                    </button>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                        Signal Lost?
+                        <a href="/forgotPassword" class="text-indigo-400 hover:text-white transition-all ml-1 underline decoration-indigo-500/20 underline-offset-4">Re-Broadcast</a>
+                    </p>
+                </div>
+        </div>
+
+        <!-- Exit Button -->
+        <a href="/" class="absolute top-10 right-10 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-600 hover:text-white hover:bg-red-500/10 hover:border-red-500/50 transition-all group shadow-xl">
+            <i class="fas fa-xmark text-lg group-hover:rotate-90 transition-transform"></i>
+        </a>
+    </div>
+
+    <script>
+        let timeLeft = 60;
+        let timerId = null;
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer');
+            const resendButton = document.getElementById('resendButton');
+            resendButton.disabled = true;
+
+            timerId = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    resendButton.disabled = false;
+                    timerDisplay.textContent = "00:00";
+                }
+            }, 1000);
+        }
+
+        startTimer();
+
+        document.getElementById('resendButton').addEventListener('click', async function () {
+            const email = document.getElementById('email').value;
+            try {
+                const response = await fetch('/forgotOtp/resend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    timeLeft = 60;
+                    clearInterval(timerId);
+                    startTimer();
+                    Swal.fire({
+                        icon: 'success', title: 'Code Resent', text: result.message,
+                        timer: 1500, showConfirmButton: false, background: '#0a0a0a', color: '#fff'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error', title: 'Failed', text: result.message,
+                        background: '#0a0a0a', color: '#fff'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error', title: 'Error', text: 'Request failed.',
+                    background: '#0a0a0a', color: '#fff'
+                });
+            }
+        });
+
+        document.getElementById('verifyOTPForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const otp = document.getElementById('otp').value.trim();
+            const otpError = document.getElementById('otpError');
+
+            otpError.classList.add('hidden');
+
+            if (!otp || !/^\d{6}$/.test(otp)) {
+                otpError.textContent = 'Please enter a valid 6-digit code';
+                otpError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch('/forgotOtp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Verified!',
+                        text: 'Code verified successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = `/resetPassword?email=${encodeURIComponent(email)}`;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Code',
+                        text: data.message || 'The code you entered is incorrect',
+                        confirmButtonColor: '#2563EB'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again.',
+                    confirmButtonColor: '#2563EB'
+                });
+            }
+        });
+
+        // Auto-focus and format OTP input
+        const otpInput = document.getElementById('otp');
+        otpInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+    </script>
+</body>
+
+</html>

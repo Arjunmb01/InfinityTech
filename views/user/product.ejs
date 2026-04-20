@@ -1,0 +1,294 @@
+<%- include('../partials/header') %>
+
+    <div class="bg-bg-primary min-h-screen pb-24 transition-colors duration-300">
+        <!-- Breadcrumbs -->
+        <div class="border-b border-border-color bg-bg-secondary/50 backdrop-blur-md sticky top-0 z-40">
+            <div class="container mx-auto px-6 py-4">
+                <nav class="flex text-[10px] uppercase tracking-[0.2em] text-text-muted" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-2">
+                        <li><a href="/" class="hover:text-accent-vivid transition-colors">Home</a></li>
+                        <li><span class="opacity-30">/</span></li>
+                        <li><a href="/shop" class="hover:text-accent-vivid transition-colors">Shop</a></li>
+                        <li><span class="opacity-30">/</span></li>
+                        <li aria-current="page" class="text-accent-vivid font-black truncate max-w-[200px]">
+                            <%= product.name %>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Product Section -->
+        <div class="container mx-auto px-6 py-16 max-w-7xl animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+                <!-- Left: Image Gallery -->
+                <div class="space-y-8">
+                    <!-- Main Image -->
+                    <div class="aspect-[4/3] bg-bg-secondary rounded-3xl flex items-center justify-center p-12 border border-border-color relative group overflow-hidden cursor-zoom-in shadow-premium glass-card border-none"
+                        id="imageContainer">
+                        <img id="mainImage" src="<%= product.images && product.images[0] ? product.images[0].url : '/images/placeholder.jpg' %>" alt="<%= product.name %>"
+                            class="max-w-full max-h-full object-contain transition-transform duration-700 filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                        <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/20 to-transparent pointer-events-none"></div>
+                    </div>
+
+                    <!-- Thumbnails -->
+                    <div class="grid grid-cols-4 sm:grid-cols-5 gap-4">
+                        <% (product.images || []).forEach((imgObj, index)=> { %>
+                            <button
+                                class="aspect-square bg-bg-secondary rounded-2xl border-2 <%= index === 0 ? 'border-accent-vivid shadow-glow' : 'border-border-color hover:border-text-muted' %> p-3 transition-all thumbnail-btn flex items-center justify-center group overflow-hidden"
+                                onclick="changeMainImage(this, '<%= imgObj.url %>')" data-image="<%= imgObj.url %>">
+                                <img src="<%= imgObj.url %>" alt="View <%= index + 1 %>"
+                                    class="max-w-full max-h-full object-contain filter group-hover:scale-110 transition-transform duration-500">
+                            </button>
+                            <% }) %>
+                    </div>
+                </div>
+
+                <!-- Right: Product Info -->
+                <div class="flex flex-col">
+                    <div class="mb-4">
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black text-accent-vivid bg-accent-vivid/10 border border-accent-vivid/20 uppercase tracking-[0.2em]">
+                            <%= product.brand %>
+                        </span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-black text-text-primary mb-8 tracking-tighter leading-[0.95] uppercase">
+                        <%= product.name %>
+                    </h1>
+
+                    <!-- Price Block -->
+                    <div class="flex items-baseline gap-6 mb-12 pb-12 border-b border-border-color">
+                        <% if (product.offerDetails.discountPercentage> 0) { %>
+                            <span class="text-5xl font-black text-text-primary tracking-tighter">₹<%=
+                                    product.offerDetails.finalPrice.toFixed(2) %></span>
+                            <div class="flex flex-col">
+                                <span class="text-xl text-text-muted font-bold line-through">₹<%=
+                                        product.offerDetails.originalPrice.toFixed(2) %></span>
+                                <span
+                                    class="text-[10px] font-black text-accent-vivid bg-accent-vivid/10 px-3 py-1 rounded-full inline-block w-fit mt-2 border border-accent-vivid/20 uppercase tracking-widest shadow-glow">
+                                    Discount: <%= product.offerDetails.discountPercentage.toFixed(0) %>%
+                                </span>
+                            </div>
+                            <% } else { %>
+                                <span class="text-5xl font-black text-text-primary tracking-tighter">₹<%=
+                                        product.offerDetails.finalPrice.toFixed(2) %></span>
+                                <% } %>
+                    </div>
+
+                    <!-- Short Description -->
+                    <div class="prose prose-invert prose-lg text-text-muted mb-12 leading-relaxed font-medium uppercase tracking-wider text-xs">
+                        <p>
+                            <%= product.description.long || product.description.short %>
+                        </p>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-12">
+                        <% if (product.stock> 0) { %>
+                            <div class="flex items-center text-accent-primary font-black text-xs uppercase tracking-widest">
+                                <div class="w-2 h-2 rounded-full bg-accent-primary mr-3 animate-pulse shadow-glow"></div>
+                                In Stock // Ready to Ship
+                            </div>
+                            <% if (product.stock < 10) { %>
+                                <p class="text-[10px] text-amber-500 mt-2 font-black uppercase tracking-[0.2em]">Critical Inventory Level: <%= product.stock %> Units Remaining</p>
+                                <% } %>
+                                    <% } else { %>
+                                        <div class="flex items-center text-red-500 font-black text-xs uppercase tracking-widest">
+                                            <div class="w-2 h-2 rounded-full bg-red-500 mr-3 animate-pulse"></div>
+                                            Out of Stock
+                                        </div>
+                                        <% } %>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <% if (product.stock> 0) { %>
+                            <button
+                                class="btn-premium flex-[2] py-5 text-sm tracking-[0.2em] font-black shadow-glow add-to-cart-btn uppercase"
+                                data-product-id="<%= product._id %>">
+                                Add to Cart
+                            </button>
+                            <button onclick="buyNow('<%= product._id %>')"
+                                class="flex-1 py-5 rounded-2xl bg-bg-secondary border border-border-color text-text-primary font-black text-xs tracking-[0.2em] hover:bg-text-primary hover:text-bg-primary transition-all uppercase">
+                                Buy Now
+                            </button>
+                        <% } else { %>
+                            <button
+                                class="w-full py-5 rounded-2xl bg-bg-secondary text-text-muted font-black text-xs tracking-[0.2em] uppercase cursor-not-allowed border border-border-color"
+                                disabled>
+                                Out of Stock
+                            </button>
+                        <% } %>
+                        <button onclick="toggleWishlist('<%= product._id %>', this)"
+                            class="w-16 h-16 flex items-center justify-center rounded-2xl bg-bg-secondary border border-border-color text-text-muted hover:text-text-primary hover:border-accent-primary/50 hover:bg-accent-primary/10 transition-all group">
+                            <i class="far fa-heart text-xl group-hover:scale-110 transition-transform"></i>
+                        </button>
+                    </div>
+
+                    <!-- Tech Specs -->
+                    <div class="mt-16 glass-card border-border-color p-8">
+                        <h3 class="text-[10px] font-black text-accent-vivid uppercase tracking-[0.3em] mb-8">Technical Specifications</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+                            <% if (product.specifications) { %>
+                                <% Object.entries(product.specifications).forEach(([key, value]) => { %>
+                                    <div class="flex items-center justify-between border-b border-border-color pb-4 group">
+                                        <span class="text-xs text-text-muted uppercase font-black tracking-widest"><%= key %></span>
+                                        <span class="text-sm font-bold text-text-primary group-hover:text-accent-vivid transition-colors">
+                                            <%= value %>
+                                        </span>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <section class="border-t border-border-color bg-bg-secondary/30 py-32 transition-colors duration-500">
+            <div class="container mx-auto px-6 max-w-7xl">
+                <div class="flex items-end justify-between mb-16">
+                    <div>
+                        <h2 class="text-3xl font-black text-text-primary tracking-tighter uppercase mb-2">Related <span class="text-accent-primary">Products</span></h2>
+                        <p class="text-text-muted text-sm font-light uppercase tracking-widest text-[10px] font-bold">Customers also bought these items.</p>
+                    </div>
+                </div>
+                <% if (recommendedProducts && recommendedProducts.length> 0) { %>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        <% recommendedProducts.forEach((rec, index)=> { %>
+                            <div class="group relative flex flex-col glass-card p-4 border-border-color transition-all duration-500 hover:border-accent-primary/30 hover:shadow-glow">
+                                <div class="relative aspect-square rounded-2xl bg-bg-secondary overflow-hidden mb-6 flex items-center justify-center p-8 group-hover:bg-text-primary/[0.08] transition-colors">
+                                    <a href="/product/<%= rec._id %>" class="relative z-10 block transform group-hover:scale-110 transition-transform duration-700">
+                                        <img src="<%= rec.images && rec.images[0] ? rec.images[0].url : '/images/placeholder.jpg' %>" alt="<%= rec.name %>" class="max-w-full max-h-full object-contain filter drop-shadow-2xl">
+                                    </a>
+                                </div>
+                                <div class="px-2">
+                                    <div class="text-[9px] font-black text-accent-primary uppercase tracking-[0.2em] mb-2"><%= rec.brand %></div>
+                                    <a href="/product/<%= rec._id %>" class="block mb-4">
+                                        <h3 class="text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1 tracking-tight"><%= rec.name %></h3>
+                                    </a>
+                                    <div class="flex items-center justify-between border-t border-border-color pt-4">
+                                        <span class="text-lg font-black text-text-primary">₹<%= rec.offerDetails.finalPrice.toLocaleString('en-IN') %></span>
+                                        <div class="w-8 h-8 rounded-lg bg-bg-secondary border border-border-color flex items-center justify-center text-text-muted group-hover:bg-accent-primary group-hover:text-white group-hover:border-accent-primary transition-all">
+                                            <i class="fas fa-arrow-right text-[10px]"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="py-20 text-center glass-card border-dashed border-border-color">
+                        <p class="text-text-muted font-medium uppercase tracking-widest text-[10px]">Alternative configurations currently unavailable.</p>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Image Switcher
+            function changeMainImage(btn, src) {
+                const img = document.getElementById('mainImage');
+                img.style.opacity = '0.5';
+                setTimeout(() => {
+                    img.src = src;
+                    img.style.opacity = '1';
+                }, 150);
+
+                document.querySelectorAll('.thumbnail-btn').forEach(b => {
+                    b.classList.remove('border-indigo-600');
+                    b.classList.add('border-slate-100');
+                });
+                btn.classList.remove('border-slate-100');
+                btn.classList.add('border-indigo-600');
+            }
+
+            // Zoom Effect (Simple)
+            const container = document.getElementById('imageContainer');
+            const img = document.getElementById('mainImage');
+            if (container && img) {
+                container.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = container.getBoundingClientRect();
+                    const x = (e.clientX - left) / width * 100;
+                    const y = (e.clientY - top) / height * 100;
+                    img.style.transformOrigin = `${x}% ${y}%`;
+                    img.style.transform = 'scale(1.5)';
+                });
+                container.addEventListener('mouseleave', () => {
+                    img.style.transform = 'scale(1)';
+                });
+            }
+
+            // Add to Cart Logic
+            document.querySelector('.add-to-cart-btn')?.addEventListener('click', async (e) => {
+                const id = e.target.closest('button').dataset.productId;
+                try {
+                    const res = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: id, quantity: 1 })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: 'Added to cart',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        // Update cart count
+                        const countBadge = document.getElementById('cart-count');
+                        if (countBadge && data.cartCount) {
+                            countBadge.innerText = data.cartCount;
+                            countBadge.classList.remove('hidden');
+                        }
+                    } else {
+                        if (data.message === 'Please login to continue') window.location.href = '/login';
+                        else Swal.fire({ toast: true, position: 'bottom-end', icon: 'error', title: data.message || 'Failed', timer: 2000 });
+                    }
+                } catch (err) { console.error(err); }
+            });
+
+            // Buy Now
+            window.buyNow = function (id) {
+                window.location.href = '/cart';
+            };
+
+            // Wishlist Toggle Function
+            async function toggleWishlist(productId, btnElement) {
+                try {
+                    const response = await fetch('/api/wishlist/toggle', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+                    const data = await response.json();
+                    const icon = btnElement.querySelector('i');
+                    if (data.success) {
+                        if (data.action === 'added') {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas', 'text-red-500');
+                            Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Added to wishlist', showConfirmButton: false, timer: 2000 });
+                        } else {
+                            icon.classList.remove('fas', 'text-red-500');
+                            icon.classList.add('far');
+                            Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Removed from wishlist', showConfirmButton: false, timer: 2000 });
+                        }
+                        const countBadge = document.getElementById('wishlist-count');
+                        if (countBadge && data.wishlistCount) {
+                            countBadge.innerText = data.wishlistCount;
+                            countBadge.classList.remove('hidden');
+                        }
+                    } else {
+                        if (data.message === 'Please login to continue') window.location.href = '/login';
+                        else Swal.fire({ toast: true, position: 'bottom-end', icon: 'error', title: data.message || 'Error', showConfirmButton: false, timer: 3000 });
+                    }
+                } catch (error) { console.error(error); }
+            }
+        </script>

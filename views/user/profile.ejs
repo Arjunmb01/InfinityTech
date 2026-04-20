@@ -1,0 +1,143 @@
+<%- include('../partials/header') %>
+
+<div class="bg-onyx-950 min-h-screen py-12">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Sidebar -->
+            <%- include('../partials/profileSideBar', { path: '/profile' }) %>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                <div class="mb-12">
+                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
+                        User <span class="text-indigo-500">Profile</span>
+                    </h1>
+                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-2">Manage your account details and security settings.</p>
+                </div>
+
+                <!-- Flash Messages -->
+                <% if (typeof messages !=='undefined' && messages.success && messages.success.length> 0) { %>
+                    <div class="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-6 py-4 rounded-2xl mb-8 flex items-center shadow-glow backdrop-blur-md">
+                        <i class="fas fa-check-circle mr-4 text-lg"></i>
+                        <span class="text-xs font-black uppercase tracking-widest"><%= messages.success %></span>
+                    </div>
+                <% } %>
+                <% if (typeof messages !=='undefined' && messages.error && messages.error.length> 0) { %>
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl mb-8 flex items-center backdrop-blur-md">
+                        <i class="fas fa-exclamation-circle mr-4 text-lg"></i>
+                        <span class="text-xs font-black uppercase tracking-widest"><%= messages.error %></span>
+                    </div>
+                <% } %>
+
+                <!-- Profile Info Card -->
+                <div class="glass-card mb-12 overflow-hidden border-white/5">
+                    <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+                                <i class="fas fa-user-circle text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-black text-white uppercase tracking-tighter">Personal info</h2>
+                        </div>
+                        <a href="/edit-profile" class="btn-premium px-6 py-3 text-[10px] font-black uppercase tracking-widest">
+                            Edit Profile
+                        </a>
+                    </div>
+
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Full Name</label>
+                            <p class="text-white font-bold text-lg tracking-tight uppercase"><%= userProfile.name %></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Email Address</label>
+                            <p class="text-white font-bold text-lg tracking-tight"><%= userProfile.email %></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Phone Number</label>
+                            <p class="text-white font-bold text-lg tracking-tight"><%= userProfile.phone || 'Not Configured' %></p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Password</label>
+                            <div class="flex items-center gap-4">
+                                <p class="text-white font-black text-lg tracking-[0.3em]">••••••••</p>
+                                <a href="/changePassword" class="text-[10px] font-black text-indigo-500 hover:text-white transition-colors uppercase tracking-widest underline underline-offset-4 decoration-indigo-500/30">Change</a>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Member Since</label>
+                            <p class="text-slate-500 font-bold text-sm uppercase tracking-widest"><%= userProfile.memberSince %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Preview -->
+                <div class="glass-card overflow-hidden border-white/5">
+                    <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+                                <i class="fas fa-shopping-bag text-xl"></i>
+                            </div>
+                            <h2 class="text-xl font-black text-white uppercase tracking-tighter">Recent Orders</h2>
+                        </div>
+                        <a href="/orders" class="text-[10px] font-black text-indigo-500 hover:text-white transition-all uppercase tracking-widest underline underline-offset-4 decoration-indigo-500/30">
+                            View All
+                        </a>
+                    </div>
+                    
+                    <div class="p-0">
+                        <% if (typeof orders !=='undefined' && orders.length> 0) { %>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="bg-white/[0.02] border-b border-white/5">
+                                            <th class="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Order ID</th>
+                                            <th class="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Date</th>
+                                            <th class="px-8 py-5 text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Status</th>
+                                            <th class="px-8 py-5 text-right text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/5">
+                                        <% orders.slice(0, 3).forEach(order=> { %>
+                                            <tr class="hover:bg-white/[0.02] transition-all group">
+                                                <td class="px-8 py-6 font-black text-white text-sm tracking-widest group-hover:text-indigo-400 transition-colors uppercase">
+                                                    #<%= order.orderNumber %>
+                                                </td>
+                                                <td class="px-8 py-6 font-bold text-slate-500 text-xs uppercase tracking-widest">
+                                                    <%= order.date %>
+                                                </td>
+                                                <td class="px-8 py-6">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest 
+                                                        <%= order.status === 'Completed' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 
+                                                           order.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
+                                                           order.status === 'Cancelled' ? 'bg-red-500/10 text-red-700 border border-red-500/20' : 'bg-white/5 text-slate-500 border border-white/10' %> shadow-glow">
+                                                        <%= order.status %>
+                                                    </span>
+                                                </td>
+                                                <td class="px-8 py-6 text-right font-black text-white text-base tracking-tighter">
+                                                    ₹<%= order.amount.toLocaleString('en-IN') %>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="p-20 text-center">
+                                <div class="w-20 h-20 bg-indigo-600/10 rounded-full flex items-center justify-center mx-auto mb-8 text-indigo-500 border border-indigo-500/20 shadow-glow">
+                                    <i class="fas fa-box-open text-3xl"></i>
+                                </div>
+                                <h3 class="text-xl font-black text-white mb-2 uppercase tracking-tighter">No Orders Found</h3>
+                                <p class="text-slate-500 mb-8 font-bold uppercase tracking-widest text-[10px]">You haven't placed any orders yet.</p>
+                                <a href="/shop" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest">
+                                    Shop Now
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

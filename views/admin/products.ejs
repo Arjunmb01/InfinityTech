@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfinityTech Admin - Products Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar-width: 16rem;
+            --primary-bg: #020617;
+            --secondary-bg: #0f1629;
+            --content-bg: #1e1b4b;
+            --accent-start: #F5C254;
+            --accent-end: #FFD666;
+            --text-color: #e5e7eb;
+            color-scheme: dark;
+        }
+
+        /* NUCLEAR VISIBILITY FIX */
+        #searchInput, #categorySelect, #statusSelect, #sortSelect {
+            color: #ffffff !important;
+            background-color: #0f172a !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+        #searchInput::placeholder {
+            color: rgba(255,255,255,0.4) !important;
+        }
+
+        .gradient-bg {
+            @apply bg-gradient-to-br from-[var(--primary-bg)] to-[var(--secondary-bg)] !important;
+        }
+
+        .glass-effect-dark {
+            @apply bg-[var(--content-bg)]/60 backdrop-blur-md border border-white/10;
+        }
+
+        .golden-button {
+            @apply bg-gradient-to-r from-[var(--accent-start)] to-[var(--accent-end)] text-[#020617] font-bold px-4 py-2 rounded-lg shadow-lg hover:scale-105 transition-all duration-300;
+        }
+
+        body {
+            @apply font-sans text-[var(--text-color)] min-h-screen m-0 p-0 bg-[var(--primary-bg)] !important;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+
+        tr:hover {
+            @apply bg-[var(--content-bg)]/50;
+        }
+
+        .pagination-container {
+            @apply mt-8 flex justify-center items-center gap-4 animate-fade-in-up animation-delay-400;
+        }
+
+        .pagination-button {
+            @apply inline-flex items-center px-4 py-2 glass-effect-dark text-sm text-white hover:bg-[#1e1b4b] transition-all duration-300 border-r border-white/10;
+            letter-spacing: 0.025em; /* Added for proper spacing */
+        }
+
+        .pagination-button.active {
+            @apply bg-gradient-to-r from-[var(--accent-start)] to-[var(--accent-end)] text-[#020617] font-bold border-none;
+        }
+
+        .pagination-button:disabled,
+        .pagination-button.opacity-50 {
+            @apply opacity-50 cursor-not-allowed hover:bg-[var(--content-bg)];
+        }
+
+        main {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            z-index: 100;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        .text-white-spaced {
+            color: #ffffff; 
+            letter-spacing: 0.025em; 
+            padding: 0.25rem 0; 
+        }
+
+
+        input, select, textarea {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+
+        input::placeholder {
+            color: #94a3b8 !important; 
+            opacity: 1 !important;
+        }
+
+        select option {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+
+        .filter-container {
+            @apply glass-effect-dark rounded-xl p-4 mb-6 animate-fade-in-up animation-delay-200 border border-white/5;
+        }
+
+        .custom-input {
+            @apply w-full px-4 py-2.5 bg-[#020617]/50 border border-white/10 rounded-lg text-white focus:border-[#F5C254] focus:ring-1 focus:ring-[#F5C254]/50 transition-all duration-300;
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+
+<body class="gradient-bg animate-gradient" style="background: linear-gradient(to bottom right, #020617, #0f1629, #1e1b4b) !important;">
+    <!-- Sidebar -->
+    <div class="sidebar fixed top-0 left-0 h-full w-64 md:w-[var(--sidebar-width)] bg-[#020617] border-r border-white/10 z-50 transition-transform duration-300 md:translate-x-0 -translate-x-full shadow-lg">
+        <div class="flex flex-col h-full text-[var(--text-color)]">
+            <div class="flex items-center justify-start p-6 border-b border-white/10">
+                <span class="text-3xl font-extrabold bg-gradient-to-r from-[#F5C254] to-[#FFD666] bg-clip-text text-transparent tracking-tight ">InfinityTech</span>
+            </div>
+            
+            <nav class="flex-1 space-y-2 p-4 overflow-y-auto">
+                <% const navItems = [
+                    { href: '/admin/dashboard', icon: 'fa-home', label: 'Dashboard', active: (typeof path !== 'undefined' && path === '/admin/dashboard') },
+                    { href: '/admin/products', icon: 'fa-box', label: 'Products', active: (typeof path !== 'undefined' && path.includes('/admin/product')) },
+                    { href: '/admin/categories', icon: 'fa-tags', label: 'Categories', active: (typeof path !== 'undefined' && path.includes('/admin/categor')) },
+                    { href: '/admin/users', icon: 'fa-users', label: 'Customers', active: (typeof path !== 'undefined' && path === '/admin/users') },
+                    { href: '/admin/orders', icon: 'fa-shopping-bag', label: 'Orders', active: (typeof path !== 'undefined' && path === '/admin/orders') },
+                    { href: '/admin/return/requests', icon: 'fa-undo', label: 'Return Orders', active: (typeof path !== 'undefined' && path === '/admin/return/requests') },
+                    { href: '/admin/offers', icon: 'fa-percentage', label: 'Offer', active: (typeof path !== 'undefined' && path === '/admin/offers') },
+                    { href: '/admin/coupons', icon: 'fa-ticket-alt', label: 'Coupon', active: (typeof path !== 'undefined' && path === '/admin/coupons') },
+                    { href: '/admin/logout', icon: 'fa-sign-out-alt', label: 'Logout', active: (typeof path !== 'undefined' && path === '/admin/logout') }
+                ]; %>
+                <% navItems.forEach(item => { %>
+                    <a href="<%= item.href %>" class="flex items-center py-2.5 px-4 rounded transition duration-300 group <%= item.active ? 'bg-gradient-to-r from-[#F5C254] to-[#FFD666] text-[#020617] font-bold scale-105 shadow-lg' : 'text-[var(--text-color)] hover:bg-[#1e1b4b] hover:text-white hover:scale-105' %>">
+                        <i class="fas <%= item.icon %> w-6 transition-transform duration-300 group-hover:rotate-12"></i>
+                        <span class="ml-3"><%= item.label %></span>
+                    </a>
+                <% }); %>
+            </nav>
+        </div>
+    </div>
+
+    <main class="flex-1 overflow-x-hidden overflow-y-auto">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Flash Messages -->
+            <% if (success_msg && success_msg.length > 0) { %>
+                <div class="glass-effect-dark px-4 py-2 rounded-lg mt-4 text-center bg-green-500/20 text-green-400 animate-fade-in-up">
+                    <%= success_msg %>
+                </div>
+            <% } %>
+            <% if (error_msg && error_msg.length > 0) { %>
+                <div class="glass-effect-dark px-4 py-2 rounded-lg mt-4 text-center bg-red-500/20 text-red-400 animate-fade-in-up">
+                    <%= error_msg %>
+                </div>
+            <% } %>
+
+            <!-- Breadcrumbs -->
+            <nav class="mb-6 animate-fade-in-up">
+                <ol class="flex items-center space-x-2 text-sm text-[var(--text-color)]">
+                    <li class="flex items-center">
+                        <a href="/admin/dashboard" class="hover:text-[var(--accent-start)] transition-colors">Dashboard</a>
+                        <span class="mx-2">/</span>
+                    </li>
+                    <li>
+                        <span class="text-[var(--accent-start)]">Products</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
+                <div>
+                    <h1 class="text-3xl font-extrabold bg-gradient-to-r from-[#F5C254] to-[#FFD666] bg-clip-text text-transparent tracking-tight">Products Management</h1>
+                    <p class="text-sm text-gray-500 mt-1">Catalog oversight and inventory control</p>
+                </div>
+                <a href="/admin/addProduct" 
+                   class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-gradient-to-r from-[#F5C254] to-[#FFD666] text-[#020617] font-extrabold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-xl group">
+                    <i class="fas fa-plus mr-2 transition-transform duration-300 group-hover:rotate-90"></i>
+                    Add Product
+                </a>
+            </div>
+
+            <!-- Enhanced Horizontal Filter Bar -->
+            <div class="filter-container !p-2">
+                <div id="filterForm" class="flex flex-col lg:flex-row gap-2 items-center">
+                    <!-- Search Bar -->
+                    <div class="flex-1 w-full min-w-[200px]">
+                        <div class="relative group">
+                            <input type="text" id="searchInput" placeholder="Search Catalog (Name, Brand, SKU)..." 
+                                   value="<%= filters.search %>"
+                                   class="w-full px-4 py-2 bg-slate-900 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-[#F5C254] focus:ring-1 focus:ring-[#F5C254]/50 transition-all duration-300">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 text-sm group-hover:text-[#F5C254] transition-colors"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap lg:flex-nowrap items-center gap-2 w-full lg:w-auto">
+                        <!-- Category Filter -->
+                        <div class="flex-1 lg:w-48">
+                            <select id="categorySelect" class="w-full px-4 py-2 bg-slate-900 border border-white/10 rounded-lg text-white focus:border-[#F5C254] focus:ring-1 focus:ring-[#F5C254]/50 transition-all duration-300">
+                                <option value="" class="bg-[#0f172a]">All Categories</option>
+                                <% categories.forEach(category => { %>
+                                    <option value="<%= category._id %>" <%= filters.category === category._id.toString() ? 'selected' : '' %> class="bg-[#0f172a]"><%= category.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="flex-1 lg:w-40">
+                            <select id="statusSelect" class="w-full px-4 py-2 bg-slate-900 border border-white/10 rounded-lg text-white focus:border-[#F5C254] focus:ring-1 focus:ring-[#F5C254]/50 transition-all duration-300">
+                                <option value="" class="bg-[#0f172a]">All Status</option>
+                                <option value="active" <%= filters.status === 'active' ? 'selected' : '' %> class="bg-[#0f172a]">Active</option>
+                                <option value="inactive" <%= filters.status === 'inactive' ? 'selected' : '' %> class="bg-[#0f172a]">Inactive</option>
+                                <option value="listed" <%= filters.status === 'listed' ? 'selected' : '' %> class="bg-[#0f172a]">Listed</option>
+                                <option value="unlisted" <%= filters.status === 'unlisted' ? 'selected' : '' %> class="bg-[#0f172a]">Unlisted</option>
+                                <option value="featured" <%= filters.status === 'featured' ? 'selected' : '' %> class="bg-[#0f172a]">Featured</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort By -->
+                        <div class="flex-1 lg:w-44">
+                            <select id="sortSelect" class="w-full px-4 py-2 bg-slate-900 border border-white/10 rounded-lg text-white focus:border-[#F5C254] focus:ring-1 focus:ring-[#F5C254]/50 transition-all duration-300">
+                                <option value="-createdAt" <%= filters.sortBy === '-createdAt' ? 'selected' : '' %> class="bg-[#0f172a]">Newest First</option>
+                                <option value="price" <%= filters.sortBy === 'price' ? 'selected' : '' %> class="bg-[#0f172a]">Price: Low to High</option>
+                                <option value="-price" <%= filters.sortBy === '-price' ? 'selected' : '' %> class="bg-[#0f172a]">Price: High to Low</option>
+                                <option value="stock" <%= filters.sortBy === 'stock' ? 'selected' : '' %> class="bg-[#0f172a]">Stock: Low to High</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <section class="glass-effect-dark rounded-xl p-6 shadow-xl border border-white/10 animate-fade-in-up animation-delay-400 relative">
+                <!-- Loader Overlay -->
+                <div id="tableLoader" class="absolute inset-0 bg-[#020617]/50 backdrop-blur-sm z-10 hidden items-center justify-center rounded-xl transition-all duration-300">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5C254]"></div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white/10">
+                        <thead>
+                            <tr class="text-left">
+                                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</th>
+                                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</th>
+                                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Stock</th>
+                                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody" class="divide-y divide-white/10 transition-opacity duration-300">
+                            <% products.forEach(product => { %>
+                                <tr class="hover:bg-white/5 transition-colors" data-product-id="<%= product._id %>">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-12 w-12 flex-shrink-0">
+                                                <img class="h-12 w-12 rounded-lg object-cover border border-white/10" 
+                                                     src="<%= product.images && product.images[0] ? product.images[0].url : '/images/placeholder.jpg' %>" 
+                                                     alt="<%= product.name %>">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-bold text-[var(--text-color)]"><%= product.name %></div>
+                                                <div class="text-xs text-gray-500"><%= product.brand %> | <%= product.sku %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-sm text-gray-300"><%= product.category ? product.category.name : 'N/A' %></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                                            <%= product.stock < 10 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30' %>">
+                                            <%= product.stock %> units
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-bold text-[var(--text-color)]">₹<%= product.salePrice.toLocaleString() %></div>
+                                        <% if (product.discount > 0) { %>
+                                            <div class="text-xs text-red-400 line-through">₹<%= product.price.toLocaleString() %></div>
+                                        <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="h-2 w-2 rounded-full <%= product.status.isActive ? 'bg-green-500' : 'bg-red-500' %>"></span>
+                                            <span class="text-xs <%= product.status.isActive ? 'text-green-400' : 'text-red-400' %>">
+                                                <%= product.status.isActive ? 'Listed' : 'Unlisted' %>
+                                            </span>
+                                        </div>
+                                        <% if (product.status.isFeatured) { %>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-star text-yellow-500 text-[10px]"></i>
+                                                <span class="text-[10px] text-yellow-500 uppercase font-bold">Featured</span>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end items-center space-x-2">
+                                            <a href="/admin/editProduct/<%= product._id %>" 
+                                               class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110"
+                                               title="Edit Product">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button data-action="toggle-list" data-id="<%= product._id %>"
+                                                    class="p-2 rounded-lg <%= product.status.isActive ? 'bg-red-500/10 text-red-400 hover:bg-red-500' : 'bg-green-500/10 text-green-400 hover:bg-green-500' %> text-white transition-all transform hover:scale-110"
+                                                    title="<%= product.status.isActive ? 'Unlist' : 'List' %> Product">
+                                                <i class="fas <%= product.status.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                                            </button>
+                                            <button data-action="toggle-featured" data-id="<%= product._id %>"
+                                                    class="p-2 rounded-lg <%= product.status.isFeatured ? 'bg-yellow-500 text-white' : 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500 hover:text-white' %> transition-all transform hover:scale-110"
+                                                    title="Toggle Featured">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                            <button data-action="soft-delete" data-id="<%= product._id %>"
+                                                    class="p-2 rounded-lg bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white transition-all transform hover:scale-110"
+                                                    title="Delete Product">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="flex justify-between items-center mt-8 text-gray-400 transition-opacity duration-300">
+                    <div id="paginationInfo" class="text-sm">
+                        Showing <span class="font-bold text-[var(--accent-start)]"><%= pagination.startIndex %></span> to <span class="font-bold text-[var(--accent-start)]"><%= pagination.endIndex %></span> of <span class="font-bold text-[var(--accent-start)]"><%= pagination.totalProducts %></span> products
+                    </div>
+                    <div id="paginationLinks" class="flex space-x-2">
+                        <% if (pagination.hasPrevPage) { %>
+                            <button data-page="<%= pagination.currentPage - 1 %>" class="pagination-btn px-4 py-2 bg-[#1e1b4b] border border-white/10 rounded-lg hover:border-[#F5C254] hover:text-[var(--accent-start)] transition-all">
+                                Previous
+                            </button>
+                        <% } %>
+                        <div class="flex items-center px-4 py-2 bg-[#F5C254] text-[#020617] font-bold rounded-lg">
+                            <%= pagination.currentPage %>
+                        </div>
+                        <% if (pagination.hasNextPage) { %>
+                            <button data-page="<%= pagination.currentPage + 1 %>" class="pagination-btn px-4 py-2 bg-[#1e1b4b] border border-white/10 rounded-lg hover:border-[#F5C254] hover:text-[var(--accent-start)] transition-all">
+                                Next
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('productTableBody');
+            const paginationContainer = document.getElementById('paginationContainer');
+            const loader = document.getElementById('tableLoader');
+            let currentPage = <%= pagination.currentPage %>;
+
+            // AJAX Data Loading
+            async function loadProducts(page = 1) {
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+                tableBody.style.opacity = '0.4';
+                paginationContainer.style.opacity = '0.4';
+
+                const search = document.getElementById('searchInput').value;
+                const category = document.getElementById('categorySelect').value;
+                const status = document.getElementById('statusSelect').value;
+                const sortBy = document.getElementById('sortSelect').value;
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+                url.searchParams.set('search', search);
+                url.searchParams.set('category', category);
+                url.searchParams.set('status', status);
+                url.searchParams.set('sortBy', sortBy);
+                url.searchParams.set('ajax', 'true');
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        renderTable(data.products);
+                        renderPagination(data.currentPage, data.totalPages, data.totalProducts, data.products.length);
+                        
+                        // Update URL
+                        const displayUrl = new URL(window.location.href);
+                        displayUrl.searchParams.set('page', page);
+                        displayUrl.searchParams.set('search', search);
+                        displayUrl.searchParams.set('category', category);
+                        displayUrl.searchParams.set('status', status);
+                        displayUrl.searchParams.set('sortBy', sortBy);
+                        window.history.pushState({}, '', displayUrl);
+                        
+                        currentPage = data.currentPage;
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update product list', background: '#020617', color: '#fff' });
+                } finally {
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                    tableBody.style.opacity = '1';
+                    paginationContainer.style.opacity = '1';
+                }
+            }
+
+            function renderTable(products) {
+                if (!products.length) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">No products found matching your criteria.</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = products.map(p => `
+                    <tr class="hover:bg-white/5 transition-colors" data-product-id="${p._id}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-12 w-12 flex-shrink-0">
+                                    <img class="h-12 w-12 rounded-lg object-cover border border-white/10" 
+                                         src="${p.images && p.images[0] ? p.images[0].url : '/images/placeholder.jpg'}" alt="${p.name}">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-bold text-[var(--text-color)]">${p.name}</div>
+                                    <div class="text-xs text-gray-500">${p.brand} | ${p.sku}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-300">${p.category ? p.category.name : 'N/A'}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                                ${p.stock < 10 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}">
+                                ${p.stock} units
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-[var(--text-color)]">₹${p.salePrice.toLocaleString()}</div>
+                            ${p.discount > 0 ? `<div class="text-xs text-red-400 line-through">₹${p.price.toLocaleString()}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full ${p.status.isActive ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                <span class="text-xs ${p.status.isActive ? 'text-green-400' : 'text-red-400'}">${p.status.isActive ? 'Listed' : 'Unlisted'}</span>
+                            </div>
+                            ${p.status.isFeatured ? `
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-star text-yellow-500 text-[10px]"></i>
+                                    <span class="text-[10px] text-yellow-500 uppercase font-bold">Featured</span>
+                                </div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end items-center space-x-2">
+                                <a href="/admin/editProduct/${p._id}" class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110"><i class="fas fa-edit"></i></a>
+                                <button data-action="toggle-list" data-id="${p._id}" class="p-2 rounded-lg ${p.status.isActive ? 'bg-red-500/10 text-red-400 hover:bg-red-500' : 'bg-green-500/10 text-green-400 hover:bg-green-500'} text-white transition-all transform hover:scale-110"><i class="fas ${p.status.isActive ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                                <button data-action="toggle-featured" data-id="${p._id}" class="p-2 rounded-lg ${p.status.isFeatured ? 'bg-yellow-500 text-white' : 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500 hover:text-white'} transition-all transform hover:scale-110"><i class="fas fa-star"></i></button>
+                                <button data-action="soft-delete" data-id="${p._id}" class="p-2 rounded-lg bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white transition-all transform hover:scale-110"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function renderPagination(current, total, totalItems, itemsOnPage) {
+                const limit = 7;
+                const startIndex = (current - 1) * limit + 1;
+                const endIndex = startIndex + itemsOnPage - 1;
+
+                document.getElementById('paginationInfo').innerHTML = `
+                    Showing <span class="font-bold text-[var(--accent-start)]">${startIndex}</span> to 
+                    <span class="font-bold text-[var(--accent-start)]">${endIndex}</span> of 
+                    <span class="font-bold text-[var(--accent-start)]">${totalItems}</span> products
+                `;
+
+                let linksHtml = '';
+                if (current > 1) {
+                    linksHtml += `<button data-page="${current - 1}" class="pagination-btn px-4 py-2 bg-[#1e1b4b] border border-white/10 rounded-lg hover:border-[#F5C254] hover:text-[var(--accent-start)] transition-all">Previous</button>`;
+                }
+                linksHtml += `<div class="flex items-center px-4 py-2 bg-[#F5C254] text-[#020617] font-bold rounded-lg">${current}</div>`;
+                if (current < total) {
+                    linksHtml += `<button data-page="${current + 1}" class="pagination-btn px-4 py-2 bg-[#1e1b4b] border border-white/10 rounded-lg hover:border-[#F5C254] hover:text-[var(--accent-start)] transition-all">Next</button>`;
+                }
+                document.getElementById('paginationLinks').innerHTML = linksHtml;
+            }
+
+            // Event Listeners
+            document.getElementById('paginationLinks').addEventListener('click', (e) => {
+                const btn = e.target.closest('.pagination-btn');
+                if (btn) loadProducts(parseInt(btn.dataset.page));
+            });
+
+            let debounceTimer;
+            document.getElementById('searchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => loadProducts(1), 500);
+            });
+
+            ['categorySelect', 'statusSelect', 'sortSelect'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => loadProducts(1));
+            });
+
+            // Action Button Delegation
+            tableBody.addEventListener('click', async (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+
+                const id = btn.dataset.id;
+                const action = btn.dataset.action;
+
+                if (action === 'toggle-list') await handleToggle(id, 'toggle-list', 'Listing status updated');
+                if (action === 'toggle-featured') await handleToggle(id, 'toggle-featured', 'Featured status updated');
+                if (action === 'soft-delete') await handleSoftDelete(id);
+            });
+
+            async function handleToggle(id, endpoint, successMsg) {
+                try {
+                    const response = await fetch(`/admin/products/${id}/${endpoint}`, { method: 'POST' });
+                    const data = await response.json();
+                    if (data.success) {
+                        loadProducts(currentPage);
+                        Swal.fire({ icon: 'success', title: 'Updated', text: data.message, timer: 1500, showConfirmButton: false, background: '#020617', color: '#fff' });
+                    }
+                } catch (error) {
+                    console.error('Toggle error:', error);
+                }
+            }
+
+            async function handleSoftDelete(id) {
+                const result = await Swal.fire({
+                    title: 'Delete Product?',
+                    text: "You can restore it later from Inactive filters.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'Yes, delete',
+                    background: '#020617',
+                    color: '#fff'
+                });
+
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/admin/softDeleteProduct/${id}`, { method: 'POST' });
+                        const data = await response.json();
+                        if (data.success) {
+                            loadProducts(currentPage);
+                            Swal.fire({ icon: 'success', title: 'Deleted', text: data.message, timer: 1500, showConfirmButton: false, background: '#020617', color: '#fff' });
+                        }
+                    } catch (error) {
+                        console.error('Delete error:', error);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

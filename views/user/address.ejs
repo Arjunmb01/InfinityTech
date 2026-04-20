@@ -1,0 +1,281 @@
+<%- include('../partials/header') %>
+
+<div class="bg-onyx-950 min-h-screen py-12">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Sidebar -->
+            <%- include('../partials/profileSideBar', { path: '/address' }) %>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
+                    <div>
+                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
+                            Saved <span class="text-indigo-500">Addresses</span>
+                        </h1>
+                        <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-2">
+                            Manage your saved shipping addresses.
+                        </p>
+                    </div>
+                    <button onclick="openModal('addAddressModal')" class="btn-premium px-8 py-4 text-[10px] font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-500 text-white shadow-glow">
+                        <i class="fas fa-plus mr-3 opacity-50"></i> Add New Address
+                    </button>
+                </div>
+
+                <!-- Address Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <% if (userAddresses && userAddresses.length > 0) { %>
+                        <% userAddresses.forEach(address => { %>
+                            <div class="glass-card p-8 relative group transition-all hover:border-indigo-500/30">
+                                <div class="flex justify-between items-start mb-6">
+                                    <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border
+                                        <%= address.addressType === 'Home' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' %>">
+                                        <%= address.addressType %>
+                                    </span>
+                                    <% if (address.isDefault) { %>
+                                        <span class="text-[9px] font-black text-indigo-500 flex items-center uppercase tracking-widest shadow-glow">
+                                            <i class="fas fa-shield-check mr-2"></i> Primary
+                                        </span>
+                                    <% } %>
+                                </div>
+
+                                <h3 class="font-black text-white text-xl uppercase tracking-tight mb-2 group-hover:text-indigo-400 transition-colors">
+                                    <%= address.name %>
+                                </h3>
+                                
+                                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-8">
+                                    <p class="text-white text-sm mb-1 line-clamp-1"><%= address.address %></p>
+                                    <p><%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+                                    <div class="flex items-center gap-2 mt-4 text-indigo-500 font-black">
+                                        <i class="fas fa-phone opacity-40"></i>
+                                        PHONE: <%= address.phone %>
+                                    </div>
+                                </div>
+
+                                <div class="pt-6 border-t border-white/5 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                    <div class="flex gap-6">
+                                        <button onclick='openEditModal(<%- JSON.stringify(address) %>)' class="text-[10px] font-black text-slate-500 hover:text-white transition-colors uppercase tracking-widest">
+                                            Edit
+                                        </button>
+                                        <button onclick="openDeleteModal('<%= address._id %>')" class="text-[10px] font-black text-slate-500 hover:text-red-500 transition-colors uppercase tracking-widest">
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <% if (!address.isDefault) { %>
+                                        <button onclick="setDefault('<%= address._id %>')" class="text-[10px] font-black text-indigo-500 hover:text-indigo-400 uppercase tracking-widest">
+                                            Set Default
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="col-span-full py-24 text-center glass-card bg-white/[0.01] border-dashed border-white/5">
+                            <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-800 border border-white/10 shadow-glow">
+                                <i class="fas fa-map-marked-alt text-2xl opacity-20"></i>
+                            </div>
+                            <h2 class="text-xl font-black text-white mb-2 uppercase tracking-tighter">No Addresses Found</h2>
+                            <p class="text-center text-slate-600 text-[11px] font-bold uppercase tracking-widest leading-loose max-w-xs mx-auto">Please add a shipping address to continue shopping.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div id="modalBackdrop" class="fixed inset-0 bg-onyx-950/80 backdrop-blur-3xl z-40 hidden transition-all duration-500 opacity-0" onclick="closeAllModals()"></div>
+
+<!-- Add Address Modal -->
+<div id="addAddressModal" class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none p-6">
+    <div class="glass-card w-full max-w-lg p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto max-h-[90vh] overflow-y-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+        <div class="flex justify-between items-center mb-10">
+            <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Add New <span class="text-indigo-500">Address</span></h3>
+            <button onclick="closeAllModals()" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <form action="/add-address" method="POST" class="space-y-6">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Address Type</label>
+                    <select name="addressType" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white appearance-none cursor-pointer focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Phone Number</label>
+                    <input type="tel" name="phone" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all tracking-widest" placeholder="10-digit phone">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Full Name</label>
+                    <input type="text" name="name" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest" placeholder="e.g. John Doe">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Street Address</label>
+                    <input type="text" name="address" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest" placeholder="Building, Street, Area">
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">City</label>
+                    <input type="text" name="city" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">State</label>
+                    <input type="text" name="state" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Pincode</label>
+                    <input type="number" name="pincode" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono">
+                </div>
+            </div>
+            <div class="pt-8 flex justify-end gap-6">
+                <button type="button" onclick="closeAllModals()" class="text-[10px] font-black text-slate-600 hover:text-white transition-all uppercase tracking-widest underline underline-offset-4 decoration-white/10">Cancel</button>
+                <button type="submit" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest shadow-glow">Save Address</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Address Modal -->
+<div id="editAddressModal" class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none p-6">
+    <div class="glass-card w-full max-w-lg p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto max-h-[90vh] overflow-y-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+        <div class="flex justify-between items-center mb-10">
+            <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Edit <span class="text-indigo-500">Address</span></h3>
+            <button onclick="closeAllModals()" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <form action="/edit-address" method="POST" class="space-y-6">
+            <input type="hidden" name="id" id="edit_id">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Address Type</label>
+                    <select name="addressType" id="edit_addressType" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white appearance-none cursor-pointer focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                        <option value="Home">Home</option>
+                        <option value="Work">Work</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Phone Number</label>
+                    <input type="tel" name="phone" id="edit_phone" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all tracking-widest">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Full Name</label>
+                    <input type="text" name="name" id="edit_name" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Street Address</label>
+                    <input type="text" name="address" id="edit_address" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">City</label>
+                    <input type="text" name="city" id="edit_city" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">State</label>
+                    <input type="text" name="state" id="edit_state" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all uppercase tracking-widest">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Pincode</label>
+                    <input type="number" name="pincode" id="edit_pincode" required class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono">
+                </div>
+            </div>
+            <div class="pt-8 flex justify-end gap-6">
+                <button type="button" onclick="closeAllModals()" class="text-[10px] font-black text-slate-600 hover:text-white transition-all uppercase tracking-widest underline underline-offset-4 decoration-white/10">Cancel</button>
+                <button type="submit" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest shadow-glow">Update Address</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function openModal(modalId) {
+        document.getElementById('modalBackdrop').classList.remove('hidden');
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modalBackdrop').classList.add('opacity-100');
+            modal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+            modal.querySelector('div').classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeAllModals() {
+        const backdrop = document.getElementById('modalBackdrop');
+        const modals = document.querySelectorAll('.fixed.inset-0.z-50');
+
+        modals.forEach(modal => {
+            const content = modal.querySelector('div');
+            if (content) {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+            }
+        });
+
+        backdrop.classList.remove('opacity-100');
+        setTimeout(() => {
+            backdrop.classList.add('hidden');
+            modals.forEach(modal => modal.classList.add('hidden'));
+        }, 300);
+    }
+
+    function openEditModal(address) {
+        document.getElementById('edit_id').value = address._id;
+        document.getElementById('edit_name').value = address.name;
+        document.getElementById('edit_address').value = address.address;
+        document.getElementById('edit_city').value = address.city;
+        document.getElementById('edit_state').value = address.state;
+        document.getElementById('edit_pincode').value = address.pincode;
+        document.getElementById('edit_phone').value = address.phone;
+        document.getElementById('edit_addressType').value = address.addressType;
+        openModal('editAddressModal');
+    }
+
+    async function openDeleteModal(id) {
+        const result = await Swal.fire({
+            title: 'Delete Address?',
+            text: "Are you sure you want to remove this address?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#6366f1',
+            cancelButtonColor: '#0a0a0a',
+            confirmButtonText: 'Yes, Delete',
+            background: '#0a0a0a',
+            color: '#fff',
+            customClass: {
+                popup: 'glass-card border-white/10 rounded-2xl shadow-2xl',
+                confirmButton: 'btn-premium px-6 py-2 text-[10px] uppercase font-black tracking-widest',
+                cancelButton: 'text-[10px] uppercase font-black tracking-widest ml-4'
+            }
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/delete-address/${id}`, { method: 'DELETE' });
+                window.location.reload();
+            } catch (err) {
+                window.location.reload();
+            }
+        }
+    }
+
+    async function setDefault(id) {
+        try {
+            await fetch('/set-default-address', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ addressId: id })
+            });
+            window.location.reload();
+        } catch (e) {
+            window.location.reload();
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

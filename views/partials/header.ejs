@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= locals.title || 'InfinityTech - Premium Tech' %>
+    </title>
+    <meta name="description"
+        content="<%= locals.description || 'Premium laptops and accessories for the professional.' %>" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Theme Initialization - must be very early to prevent flash of light mode
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemDark ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            // Store it back to ensure initial state is saved
+            if (!savedTheme) localStorage.setItem('theme', theme);
+        })();
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        onyx: {
+                            950: 'var(--bg-primary)',
+                            900: 'var(--bg-secondary)',
+                            800: 'var(--bg-tertiary)',
+                        },
+                        accent: {
+                            primary: 'var(--accent-primary)',
+                            vivid: 'var(--accent-primary)',
+                        },
+                        text: {
+                            primary: 'var(--text-primary)',
+                            secondary: 'var(--text-secondary)',
+                            muted: 'var(--text-muted)',
+                        },
+                        border: 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px var(--accent-glow)',
+                        'premium': 'var(--card-shadow)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" />
+
+    <style>
+        :root {
+            --bg-primary: #FCFDFF;
+            --bg-secondary: #F5F8FF;
+            --bg-tertiary: #EEF2FF;
+            --text-primary: #0A0C10;
+            --text-secondary: #334155;
+            --text-muted: #57657d;
+            --accent-primary: #2563EB;
+            --accent-hover: #1D4ED8;
+            --accent-glow: rgba(37, 99, 235, 0.1);
+            --border-color: rgba(37, 99, 235, 0.08);
+            --glass-bg: rgba(252, 253, 255, 0.85);
+            --card-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.04), 0 8px 10px -6px rgba(37, 99, 235, 0.04);
+            --premium-gradient: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+        }
+
+        .dark {
+            --bg-primary: #09090b;
+            --bg-secondary: #0f0f12;
+            --bg-tertiary: #17171a;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-primary: #818cf8;
+            --accent-hover: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(9, 9, 11, 0.85);
+            --card-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            --premium-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+        }
+
+        .glass-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link-active {
+            color: var(--accent-primary) !important;
+            background: var(--bg-tertiary) !important;
+        }
+
+        .premium-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .premium-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px -10px var(--accent-glow);
+            transform: translateY(-4px);
+        }
+
+        .btn-premium {
+            background: var(--premium-gradient);
+            box-shadow: 0 4px 14px 0 var(--accent-glow);
+            transition: all 0.3s ease;
+            color: white !important;
+        }
+
+        .text-gradient {
+            background: var(--premium-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen text-slate-300 bg-onyx selection:bg-indigo-500/30 selection:text-indigo-200">
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 glass-header">
+        <nav x-data="navigationMenu()" class="container mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="relative w-11 h-11 flex items-center justify-center rounded-xl bg-premium-gradient shadow-lg transform group-hover:rotate-12 transition-all duration-500 overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fas fa-infinity text-white text-xl relative z-10"></i>
+                </div>
+                <div class="flex flex-col -space-y-1">
+                    <span class="text-2xl font-black tracking-tighter text-text-primary">INFINITY<span class="text-gradient">TECH</span></span>
+                    <span class="text-[8px] font-black tracking-[0.4em] text-text-muted uppercase">Premium Ecosystem</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-1 p-1 bg-bg-secondary/50 rounded-2xl border border-border">
+                <a href="/" id="nav-home"
+                    class="nav-link px-5 py-2 text-[0.8rem] font-bold rounded-xl hover:bg-bg-primary transition-all duration-300">
+                    Home
+                </a>
+                <a href="/shop" id="nav-shop"
+                    class="nav-link px-5 py-2 text-[0.8rem] font-bold rounded-xl hover:bg-bg-primary transition-all duration-300">
+                    Shop
+                </a>
+                <a href="/about" id="nav-about"
+                    class="nav-link px-5 py-2 text-[0.8rem] font-bold rounded-xl hover:bg-bg-primary transition-all duration-300">
+                    About
+                </a>
+                <a href="/contact" id="nav-contact"
+                    class="nav-link px-5 py-2 text-[0.8rem] font-bold rounded-xl hover:bg-bg-primary transition-all duration-300">
+                    Contact
+                </a>
+            </div>
+
+            <!-- User Actions -->
+            <div class="flex items-center space-x-2">
+                <!-- Theme Toggle -->
+                <button @click="toggleTheme" 
+                    class="p-2.5 text-text-muted hover:text-accent-vivid hover:bg-accent-vivid/10 rounded-xl transition-all duration-300 group overflow-hidden">
+                    <svg x-show="!dark" class="w-5 h-5 transition-all group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg x-show="dark" class="w-5 h-5 transition-all group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354a9 9 0 01-11.708-11.708 9.963 9.963 0 001.223 9.209 9.963 9.963 0 009.209 1.223z"></path>
+                    </svg>
+                </button>
+
+                <!-- Search -->
+                <button class="p-2.5 text-text-muted hover:text-accent-vivid hover:bg-accent-vivid/10 rounded-xl transition-all duration-300 group">
+                    <svg title="Search" class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
+ 
+                <!-- Cart -->
+                <a href="/cart" class="relative p-2.5 text-text-muted hover:text-accent-vivid hover:bg-accent-vivid/10 rounded-xl transition-all duration-300 group">
+                    <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <span id="cart-count"
+                        class="hidden absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-accent-vivid text-[10px] font-black text-white rounded-full flex items-center justify-center shadow-glow animate-pulse px-1">0</span>
+                </a>
+ 
+                <!-- Wishlist -->
+                <a href="/wishlist" class="relative p-2.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all duration-300 group">
+                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                    <span id="wishlist-count"
+                        class="hidden absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-red-500 text-[10px] font-black text-white rounded-full flex items-center justify-center shadow-lg px-1">0</span>
+                </a>
+
+                <!-- User Profile -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false"
+                        class="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-300 transform hover:scale-110 focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown -->
+                    <template x-if="open">
+                        <div x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             class="absolute right-0 mt-4 w-56 bg-onyx-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-3 z-[60] overflow-hidden origin-top-right">
+                            <% if (typeof user !=='undefined' && user) { %>
+                                <div class="px-5 py-4 border-b border-white/5 mb-2 bg-white/5">
+                                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Signed In</p>
+                                    <p class="text-sm font-black text-white truncate"><%= user.name %></p>
+                                    <p class="text-[10px] text-slate-500 truncate font-medium"><%= user.email %></p>
+                                </div>
+                                <div class="px-2 space-y-1">
+                                    <a href="/profile" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white hover:bg-indigo-600/20 rounded-xl transition-all">
+                                        <i class="fas fa-id-card text-[10px] text-indigo-500"></i> My Profile
+                                    </a>
+                                    <a href="/orders" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white hover:bg-indigo-600/20 rounded-xl transition-all">
+                                        <i class="fas fa-box-open text-[10px] text-indigo-500"></i> My Orders
+                                    </a>
+                                    <a href="/wishlist" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white hover:bg-indigo-600/20 rounded-xl transition-all">
+                                        <i class="fas fa-heart text-[10px] text-indigo-500"></i> Wishlist
+                                    </a>
+                                </div>
+                                <div class="border-t border-white/5 my-2 mx-2"></div>
+                                <div class="px-2">
+                                    <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:text-white hover:bg-red-500/20 rounded-xl transition-all">
+                                        <i class="fas fa-power-off text-[10px]"></i> Logout
+                                    </a>
+                                </div>
+                            <% } else { %>
+                                <div class="px-2 space-y-1">
+                                    <a href="/login" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white hover:bg-indigo-600/20 rounded-xl transition-all">
+                                        <i class="fas fa-sign-in-alt text-[10px] text-indigo-500"></i> Login
+                                    </a>
+                                    <a href="/signup" class="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white hover:bg-indigo-600/20 rounded-xl transition-all">
+                                        <i class="fas fa-user-plus text-[10px] text-indigo-500"></i> Create Account
+                                    </a>
+                                </div>
+                            <% } %>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button @click="toggleMobileMenu" class="md:hidden text-white focus:outline-none p-2 hover:bg-white/5 rounded-lg transition-colors">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                        <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" 
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 -translate-y-4" 
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200" 
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="md:hidden absolute top-[80px] left-0 w-full bg-onyx/95 backdrop-blur-xl border-b border-white/5 shadow-2xl px-6 py-8 z-40">
+            <div class="flex flex-col space-y-6">
+                <!-- Mobile Quick Actions -->
+                <div class="grid grid-cols-4 gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <a href="/cart" class="flex flex-col items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-500 border border-indigo-500/20 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                            <i class="fas fa-shopping-cart text-xs"></i>
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-slate-500">Cart</span>
+                    </a>
+                    <a href="/wishlist" class="flex flex-col items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 border border-white/5 group-hover:bg-red-500/20 group-hover:text-red-500 group-hover:border-red-500/30 transition-all">
+                            <i class="fas fa-heart text-xs"></i>
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-slate-500">Wishlist</span>
+                    </a>
+                    <a href="/profile" class="flex flex-col items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 border border-white/5 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                            <i class="fas fa-user-circle text-xs"></i>
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-slate-500">Profile</span>
+                    </a>
+                    <a href="/orders" class="flex flex-col items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 border border-white/5 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                            <i class="fas fa-box text-xs"></i>
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-slate-500">Orders</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="space-y-1">
+                    <a href="/" class="block px-4 py-3 text-lg font-black text-white hover:text-indigo-400 transition-colors uppercase tracking-tighter">Home</a>
+                    <a href="/shop" class="block px-4 py-3 text-lg font-black text-white hover:text-indigo-400 transition-colors uppercase tracking-tighter">Shop</a>
+                    <a href="/about" class="block px-4 py-3 text-lg font-black text-white hover:text-indigo-400 transition-colors uppercase tracking-tighter">About</a>
+                    <a href="/contact" class="block px-4 py-3 text-lg font-black text-white hover:text-indigo-400 transition-colors uppercase tracking-tighter">Contact</a>
+                </div>
+
+                <hr class="border-white/5 my-2">
+                
+                <% if (!locals.user) { %>
+                    <div class="flex flex-col gap-3 px-4">
+                        <a href="/login" class="text-center py-4 bg-white/5 border border-white/10 rounded-2xl text-xs font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all">Log In</a>
+                        <a href="/signup" class="btn-premium text-center py-4 rounded-2xl text-xs font-black text-white uppercase tracking-widest">Sign Up</a>
+                    </div>
+                <% } else { %>
+                    <div class="px-4">
+                        <a href="/logout" class="flex items-center justify-center gap-3 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-xs font-black text-red-500 uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                            <i class="fas fa-power-off text-[10px]"></i> Log Out
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <script>
+            function navigationMenu() {
+                return {
+                    mobileMenuOpen: false,
+                    dark: document.documentElement.classList.contains('dark'),
+                    toggleMobileMenu() {
+                        this.mobileMenuOpen = !this.mobileMenuOpen;
+                    },
+                    toggleTheme() {
+                        this.dark = !this.dark;
+                        if (this.dark) {
+                            document.documentElement.classList.add('dark');
+                            localStorage.setItem('theme', 'dark');
+                        } else {
+                            document.documentElement.classList.remove('dark');
+                            localStorage.setItem('theme', 'light');
+                        }
+                    },
+                    init() {
+                        // Re-sync dark state in case it changed between pages
+                        this.dark = document.documentElement.classList.contains('dark');
+                    }
+                }
+            }
+
+            // Cart and Wishlist Count Logic
+            async function updateCounts() {
+                try {
+                    const cartRes = await fetch('/api/cart/count');
+                    const cartData = await cartRes.json();
+                    const cartBadge = document.getElementById('cart-count');
+                    if (cartData.count > 0 && cartBadge) {
+                        cartBadge.textContent = cartData.count;
+                        cartBadge.classList.remove('hidden');
+                    }
+
+                    const wishRes = await fetch('/api/wishlist/count');
+                    const wishData = await wishRes.json();
+                    const wishBadge = document.getElementById('wishlist-count');
+                    if (wishData.count > 0 && wishBadge) {
+                        wishBadge.textContent = wishData.count;
+                        wishBadge.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error('Failed to update counts', e);
+                }
+            }
+            document.addEventListener('DOMContentLoaded', updateCounts);
+
+            // Highlight active navigation link
+            function highlightActiveNav() {
+                const currentPath = window.location.pathname;
+                const navLinks = {
+                    '/': 'nav-home',
+                    '/shop': 'nav-shop',
+                    '/about': 'nav-about',
+                    '/contact': 'nav-contact'
+                };
+
+                Object.keys(navLinks).forEach(path => {
+                    const linkId = navLinks[path];
+                    const link = document.getElementById(linkId);
+                    if (link && (currentPath === path || (path !== '/' && currentPath.startsWith(path)))) {
+                        link.classList.add('nav-link-active');
+                    } else if (link) {
+                        link.classList.remove('nav-link-active');
+                    }
+                });
+            }
+
+            // Initialize active nav highlight
+            highlightActiveNav();
+
+            // Add scroll effect to header
+            const header = document.querySelector('.glass-header');
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll > 100) {
+                    header.style.boxShadow = '0 4px 12px -2px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05)';
+                }
+                lastScroll = currentScroll;
+            });
+        </script>
+    </header>
+    <!-- Spacer for sticky header -->
+    <div class="h-20"></div>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-grow">

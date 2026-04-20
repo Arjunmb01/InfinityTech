@@ -1,0 +1,445 @@
+<%- include('./partials/adminHeader.ejs') %>
+
+<style>
+    :root {
+        --primary-gold: #F5C254;
+        --secondary-gold: #FFD666;
+        --dark-bg: #020617;
+        --card-bg: #1e1b4b;
+        --text-main: #e5e7eb;
+    }
+
+    .glass-effect-dark {
+        background: rgba(30, 27, 75, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(245, 194, 84, 0.1);
+    }
+
+    .golden-input {
+        background: rgba(2, 6, 23, 0.5);
+        border: 1px solid rgba(245, 194, 84, 0.2);
+        color: var(--text-main);
+        transition: all 0.3s ease;
+    }
+
+    .golden-input:focus {
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 2px rgba(245, 194, 84, 0.1);
+        outline: none;
+    }
+
+    .golden-btn {
+        background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
+        color: #020617;
+        font-weight: 800;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .golden-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 194, 84, 0.2);
+    }
+
+    .spec-row {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+</style>
+
+<div class="flex min-h-screen bg-[#020617]">
+    <!-- Sidebar Placeholder (Standard Admin Sidebar) -->
+    <%- include('./partials/adminSidebar.ejs') %>
+
+    <main class="flex-1 ml-0 md:ml-64 p-6 md:p-10">
+        <div class="max-w-5xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-10 animate-fade-in-up">
+                <div>
+                    <h1 class="text-4xl font-black bg-gradient-to-r from-[#F5C254] to-[#FFD666] bg-clip-text text-transparent">Edit Product</h1>
+                    <p class="text-gray-500 mt-2">Modify details for <span class="text-[#F5C254] font-bold"><%= product.name %></span></p>
+                </div>
+                <a href="/admin/products" class="golden-btn px-6 py-3 rounded-xl flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to List
+                </a>
+            </div>
+
+            <form id="editProductForm" action="/admin/editProduct/<%= product._id %>" method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Left Column: Primary Details -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="glass-effect-dark rounded-2xl p-8 space-y-6">
+                            <h3 class="text-xl font-bold text-[#F5C254] border-b border-white/10 pb-4">Essential Information</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-gray-400">Product Name</label>
+                                    <input type="text" name="name" value="<%= product.name %>" required class="golden-input w-full px-4 py-3 rounded-xl">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-bold text-gray-400">Brand</label>
+                                    <input type="text" name="brand" value="<%= product.brand %>" required class="golden-input w-full px-4 py-3 rounded-xl">
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Short Description (Cards & Previews)</label>
+                                <textarea name="shortDescription" rows="2" required class="golden-input w-full px-4 py-3 rounded-xl"><%= product.description.short %></textarea>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Full Description (Product Page)</label>
+                                <textarea name="longDescription" rows="6" required class="golden-input w-full px-4 py-3 rounded-xl"><%= product.description.long %></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Specifications -->
+                        <div class="glass-effect-dark rounded-2xl p-8 space-y-6">
+                            <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                                <h3 class="text-xl font-bold text-[#F5C254]">Technical Specifications</h3>
+                                <button type="button" id="addSpecBtn" class="text-xs font-bold text-[#F5C254] hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-lg">
+                                    <i class="fas fa-plus mr-2"></i>Add Line
+                                </button>
+                            </div>
+
+                            <div id="specContainer" class="space-y-4">
+                                <% 
+                                    let specs = [];
+                                    if (product.specifications) {
+                                        if (product.specifications instanceof Map) {
+                                            product.specifications.forEach((value, key) => { specs.push({ key, value }); });
+                                        } else {
+                                            Object.entries(product.specifications).forEach(([key, value]) => { specs.push({ key, value }); });
+                                        }
+                                    }
+                                %>
+                                <% if (specs.length > 0) { %>
+                                    <% specs.forEach(spec => { %>
+                                        <div class="spec-row grid grid-cols-1 md:grid-cols-2 gap-4 relative group">
+                                            <input type="text" name="specKey" value="<%= spec.key %>" placeholder="Property" class="golden-input px-4 py-2 rounded-lg text-sm">
+                                            <div class="relative">
+                                                <input type="text" name="specValue" value="<%= spec.value %>" placeholder="Value" class="golden-input w-full px-4 py-2 rounded-lg text-sm pr-10">
+                                                <button type="button" class="remove-spec absolute right-2 top-1/2 -translate-y-1/2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div class="spec-row grid grid-cols-1 md:grid-cols-2 gap-4 relative group">
+                                        <input type="text" name="specKey" placeholder="Property" class="golden-input px-4 py-2 rounded-lg text-sm">
+                                        <div class="relative">
+                                            <input type="text" name="specValue" placeholder="Value" class="golden-input w-full px-4 py-2 rounded-lg text-sm pr-10">
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Media & Inventory -->
+                    <div class="space-y-6">
+                        <!-- Pricing & Stock -->
+                        <div class="glass-effect-dark rounded-2xl p-8 space-y-6">
+                            <h3 class="text-xl font-bold text-[#F5C254] border-b border-white/10 pb-4">Inventory</h3>
+                            
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Regular Price (₹)</label>
+                                <input type="number" name="price" value="<%= product.price %>" step="0.01" required class="golden-input w-full px-4 py-3 rounded-xl">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Sale Price (₹)</label>
+                                <input type="number" name="salePrice" value="<%= product.salePrice || product.price %>" step="0.01" required class="golden-input w-full px-4 py-3 rounded-xl">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Available Stock</label>
+                                <input type="number" name="stock" value="<%= product.stock %>" required class="golden-input w-full px-4 py-3 rounded-xl">
+                            </div>
+                        </div>
+
+                        <!-- Categories -->
+                        <div class="glass-effect-dark rounded-2xl p-8 space-y-6">
+                            <h3 class="text-xl font-bold text-[#F5C254] border-b border-white/10 pb-4">Classification</h3>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Root Category</label>
+                                <select id="rootCategory" name="category" required class="golden-input w-full px-4 py-3 rounded-xl">
+                                    <option value="">Select Category</option>
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat._id %>" <%= product.category?._id.toString() === cat._id.toString() ? 'selected' : '' %>>
+                                            <%= cat.name %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-gray-400">Subcategory</label>
+                                <select id="subcategory" name="subcategory" class="golden-input w-full px-4 py-3 rounded-xl">
+                                    <option value="">No Subcategory</option>
+                                    <% subcategories.forEach(sub => { %>
+                                        <option value="<%= sub._id %>" <%= product.subcategory?._id.toString() === sub._id.toString() ? 'selected' : '' %>>
+                                            <%= sub.name %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Media Replacement -->
+                        <div class="glass-effect-dark rounded-2xl p-8 space-y-6">
+                            <h3 class="text-xl font-bold text-[#F5C254] border-b border-white/10 pb-4">Gallery</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <% if (product.images && product.images.length > 0) { %>
+                                    <% product.images.forEach((img, idx) => { %>
+                                        <div class="relative group aspect-square rounded-xl overflow-hidden border border-white/10">
+                                            <img src="<%= img.url %>" class="w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button type="button" class="replace-img-btn text-[10px] font-black uppercase text-[#F5C254] hover:scale-110 transition-transform bg-white/10 px-3 py-1 rounded-full"
+                                                        data-id="<%=product._id%>" data-index="<%=idx%>">
+                                                    <i class="fas fa-sync-alt mr-1"></i> Replace
+                                                </button>
+                                                <button type="button" class="delete-img-btn text-[10px] font-black uppercase text-red-500 hover:scale-110 transition-transform bg-white/10 px-3 py-1 rounded-full"
+                                                        data-id="<%=product._id%>" data-index="<%=idx%>">
+                                                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+                            <div class="mt-4">
+                                <label class="text-xs font-bold text-gray-500 uppercase block mb-2">Append New Images (Multi-select)</label>
+                                <input type="file" id="appendImages" name="images" multiple 
+                                       class="text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#F5C254] file:text-[#020617] hover:file:bg-[#FFD666] w-full">
+                                <div id="newImagesPreview" class="grid grid-cols-3 gap-2 mt-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="fixed bottom-0 left-0 md:left-64 right-0 p-6 glass-effect-dark border-t border-white/10 z-30 flex justify-end gap-4">
+                    <button type="button" onclick="window.location='/admin/products'" class="px-8 py-3 rounded-xl font-bold text-gray-400 hover:text-white transition-colors">Cancel</button>
+                    <button type="submit" id="saveBtn" class="golden-btn px-12 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+                        <i class="fas fa-save"></i>
+                        Update Product Records
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('editProductForm');
+        const specContainer = document.getElementById('specContainer');
+        const addSpecBtn = document.getElementById('addSpecBtn');
+        const rootCatSelect = document.getElementById('rootCategory');
+        const subCatSelect = document.getElementById('subcategory');
+        const appendImagesInput = document.getElementById('appendImages');
+        const newImagesPreview = document.getElementById('newImagesPreview');
+
+        // Dynamic Subcategories
+        rootCatSelect.addEventListener('change', async () => {
+            const rootId = rootCatSelect.value;
+            subCatSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            if (!rootId) {
+                subCatSelect.innerHTML = '<option value="">No Subcategory</option>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/admin/categories?ajax=true&parent=${rootId}`);
+                const data = await res.json();
+                
+                subCatSelect.innerHTML = '<option value="">No Subcategory</option>';
+                if (data.success && data.categories.length > 0) {
+                    data.categories.forEach(sub => {
+                        const opt = document.createElement('option');
+                        opt.value = sub._id;
+                        opt.textContent = sub.name;
+                        subCatSelect.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load subcategories');
+            }
+        });
+
+        // Multi-image Preview for additions
+        appendImagesInput.addEventListener('change', () => {
+            newImagesPreview.innerHTML = '';
+            const files = Array.from(appendImagesInput.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'aspect-square rounded-lg overflow-hidden border border-white/5 relative group';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                             <span class="text-[8px] font-bold text-white uppercase bg-black/60 px-2 py-1 rounded">Selected</span>
+                        </div>
+                    `;
+                    newImagesPreview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Dynamic Specifications
+        addSpecBtn.addEventListener('click', () => {
+            const div = document.createElement('div');
+            div.className = 'spec-row grid grid-cols-1 md:grid-cols-2 gap-4 relative group';
+            div.innerHTML = `
+                <input type="text" name="specKey" placeholder="Property" class="golden-input px-4 py-2 rounded-lg text-sm">
+                <div class="relative">
+                    <input type="text" name="specValue" placeholder="Value" class="golden-input w-full px-4 py-2 rounded-lg text-sm pr-10">
+                    <button type="button" class="remove-spec absolute right-2 top-1/2 -translate-y-1/2 text-red-500 transition-opacity">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            `;
+            specContainer.appendChild(div);
+        });
+
+        specContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-spec')) {
+                const row = e.target.closest('.spec-row');
+                row.style.opacity = '0';
+                row.style.transform = 'scale(0.9)';
+                setTimeout(() => row.remove(), 200);
+            }
+        });
+
+        // Gallery Actions (Delegated)
+        document.body.addEventListener('click', (e) => {
+            const replaceBtn = e.target.closest('.replace-img-btn');
+            const deleteBtn = e.target.closest('.delete-img-btn');
+            
+            if (replaceBtn) {
+                replaceImage(replaceBtn.dataset.id, replaceBtn.dataset.index);
+            } else if (deleteBtn) {
+                deleteExistingImage(deleteBtn.dataset.id, deleteBtn.dataset.index);
+            }
+        });
+
+        // Form Submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<div class="h-5 w-5 border-2 border-[#020617] border-t-transparent animate-spin rounded-full"></div> Updating...';
+
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Synchronized!',
+                        text: 'Product database has been updated successfully.',
+                        confirmButtonColor: '#F5C254',
+                        background: '#020617',
+                        color: '#fff'
+                    }).then(() => window.location.href = '/admin/products');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Update Failed', text: err.message, background: '#020617', color: '#fff' });
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Product Records';
+            }
+        });
+    });
+
+    async function replaceImage(productId, idx) {
+        const { value: file } = await Swal.fire({
+            title: 'Replace High-Res Asset',
+            text: 'Choose a new source image for this gallery slot.',
+            input: 'file',
+            inputAttributes: { accept: 'image/*', 'aria-label': 'Upload media' },
+            showCancelButton: true,
+            confirmButtonColor: '#F5C254',
+            background: '#020617',
+            color: '#fff'
+        });
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('newImage', file);
+            formData.append('imageIndex', idx);
+
+            Swal.fire({ title: 'Processing Media...', background: '#020617', color: '#fff', didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`/admin/replaceProductImage/${productId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message, background: '#020617', color: '#fff' });
+            }
+        }
+    }
+
+    async function deleteExistingImage(productId, idx) {
+        const result = await Swal.fire({
+            title: 'Remove Asset?',
+            text: "This image will be permanently deleted from the product gallery.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'Yes, delete it',
+            background: '#020617',
+            color: '#fff'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Removing...', background: '#020617', color: '#fff', didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`/admin/removeProductImage/${productId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageIndex: idx })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Deletion Failed', text: err.message, background: '#020617', color: '#fff' });
+            }
+        }
+    }
+</script>
+
+<%- include('./partials/adminFooter.ejs') %>

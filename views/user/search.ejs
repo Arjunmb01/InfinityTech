@@ -1,0 +1,95 @@
+<%- include('../partials/header') %>
+
+<div class="bg-bg-primary min-h-screen py-24 transition-colors duration-300">
+    <div class="container mx-auto px-6">
+        <!-- Search Header -->
+        <div class="mb-16">
+            <h1 class="text-4xl md:text-5xl font-black text-text-primary tracking-tighter uppercase leading-tight">
+                <% if (searchQuery) { %>
+                    Query Results: <span class="text-accent-vivid">"<%= searchQuery %>"</span>
+                <% } else { %>
+                    Hardware <span class="text-accent-vivid underline decoration-accent-vivid/20 underline-offset-8">Discovery</span>
+                <% } %>
+            </h1>
+            <p class="mt-4 text-[10px] uppercase font-bold tracking-[0.3em] text-text-secondary">
+                <%= products.length %> Architectures Identified in Primary Cache
+            </p>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <% if (products.length > 0) { %>
+                <% products.forEach((product, index) => { %>
+                    <div class="group relative flex flex-col glass-card p-6 border-border-color transition-all duration-500 hover:border-accent-vivid/30 hover:shadow-glow animate-fade-in"
+                        style="animation-delay: <%= index * 0.05 %>">
+                        
+                        <!-- Image Container -->
+                        <div class="relative aspect-square rounded-2xl bg-bg-secondary overflow-hidden mb-8 flex items-center justify-center p-8 group-hover:bg-text-primary/[0.08] transition-all">
+                            <a href="/product/<%= product._id %>" class="relative z-10 block transform group-hover:scale-110 transition-transform duration-700">
+                                <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" 
+                                     alt="<%= product.name %>"
+                                     class="max-w-full max-h-full object-contain filter drop-shadow-2xl">
+                            </a>
+
+                            <!-- Actions Overlay -->
+                            <div class="absolute inset-0 bg-bg-primary/80 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-4 z-20 backdrop-blur-md">
+                                <a href="/product/<%= product._id %>" 
+                                   class="w-14 h-14 rounded-2xl bg-bg-secondary border border-border-color text-text-primary flex items-center justify-center hover:bg-text-primary hover:text-bg-primary transition-all transform hover:scale-110">
+                                    <i class="fas fa-eye text-lg"></i>
+                                </a>
+                                <button onclick="addToCart('<%= product._id %>')" 
+                                    class="w-14 h-14 rounded-2xl bg-accent-vivid text-white flex items-center justify-center hover:bg-text-primary hover:text-bg-primary transition-all transform hover:scale-110 shadow-glow">
+                                    <i class="fas fa-cart-plus text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="space-y-4">
+                            <div class="text-[10px] font-black text-accent-vivid uppercase tracking-[0.3em]">
+                                <%= product.category ? product.category.name : 'Hardware' %>
+                            </div>
+                            <a href="/product/<%= product._id %>" class="block">
+                                <h3 class="text-xl font-bold text-text-primary group-hover:text-accent-vivid transition-colors line-clamp-1 tracking-tight">
+                                    <%= product.name %>
+                                </h3>
+                            </a>
+                            <div class="flex items-center justify-between border-t border-border-color pt-6">
+                                <div class="flex flex-col">
+                                    <% if (product.discountPercentage > 0) { %>
+                                        <span class="text-text-secondary text-[10px] font-bold line-through mb-1">₹<%= product.price.toLocaleString('en-IN') %></span>
+                                        <span class="text-2xl font-black text-text-primary tracking-tighter">₹<%= (product.price * (1 - product.discountPercentage/100)).toLocaleString('en-IN') %></span>
+                                    <% } else { %>
+                                        <span class="text-2xl font-black text-text-primary tracking-tighter">₹<%= product.price.toLocaleString('en-IN') %></span>
+                                    <% } %>
+                                </div>
+                                <div class="flex items-center gap-2 bg-bg-secondary px-3 py-1.5 rounded-xl border border-border-color">
+                                    <i class="fas fa-star text-accent-vivid text-[10px]"></i>
+                                    <span class="text-xs font-black text-text-primary"><%= product.rating || '4.8' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="col-span-full py-32 text-center glass-card border-dashed border-border-color">
+                    <div class="w-24 h-24 bg-accent-vivid/10 rounded-full flex items-center justify-center mx-auto mb-10 text-accent-vivid border border-accent-vivid/20 shadow-glow">
+                        <i class="fas fa-satellite-dish text-4xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-text-primary mb-4 uppercase tracking-tighter">Null Result Signal</h3>
+                    <p class="text-text-secondary mb-10 font-bold uppercase tracking-widest text-xs">The requested architecture does not exist in the primary databank.</p>
+                    <div class="flex items-center justify-center gap-6">
+                        <a href="/shop" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest">
+                            Initialize Shop
+                        </a>
+                        <a href="/" class="text-text-primary text-[10px] font-black uppercase tracking-widest hover:text-accent-vivid transition-colors underline underline-offset-8 decoration-border-color">
+                            Return to Nexus
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

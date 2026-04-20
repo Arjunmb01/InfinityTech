@@ -1,0 +1,71 @@
+<div
+  class="hidden md:flex flex-col w-64 bg-onyx-950 border-r border-white/10 min-h-screen pt-8 pb-12 sticky top-20 h-[calc(100vh-5rem)]">
+  <% const currentPath=typeof path !=='undefined' ? path : '' ; %>
+    <div class="px-6 mb-8">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Account</h3>
+      <nav class="space-y-1">
+        <a href="/profile"
+          class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 <%= currentPath === '/profile' ? 'bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(79,70,229,0.2)] border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white' %>">
+          <i
+            class="far fa-user w-5 mr-3 text-lg <%= currentPath === '/profile' ? 'text-indigo-400' : 'text-slate-500' %>"></i>
+          Profile
+        </a>
+        <a href="/address"
+          class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 <%= currentPath === '/address' ? 'bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(79,70,229,0.2)] border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white' %>">
+          <i
+            class="far fa-address-book w-5 mr-3 text-lg <%= currentPath === '/address' ? 'text-indigo-400' : 'text-slate-500' %>"></i>
+          Addresses
+        </a>
+        <a href="/wallet"
+          class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 <%= currentPath === '/wallet' ? 'bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(79,70,229,0.2)] border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white' %>">
+          <i
+            class="fas fa-wallet w-5 mr-3 text-lg <%= currentPath === '/wallet' ? 'text-indigo-400' : 'text-slate-500' %>"></i>
+          Wallet
+        </a>
+      </nav>
+    </div>
+
+    <div class="px-6 mb-8">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Orders</h3>
+      <nav class="space-y-1">
+        <a href="/orders"
+          class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-300 <%= currentPath === '/orders' ? 'bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(79,70,229,0.2)] border border-indigo-500/20' : 'text-slate-400 hover:bg-white/5 hover:text-white' %>">
+          <i
+            class="fas fa-box-open w-5 mr-3 text-lg <%= currentPath === '/orders' ? 'text-indigo-400' : 'text-slate-500' %>"></i>
+          My Orders
+        </a>
+      </nav>
+    </div>
+
+    <div class="mt-auto px-6">
+      <a href="/logout"
+        class="flex items-center px-3 py-2 text-sm font-medium text-red-400 rounded-lg hover:bg-red-500/10 transition-colors">
+        <i class="fas fa-sign-out-alt w-5 mr-3 text-lg"></i>
+        Sign Out
+      </a>
+    </div>
+</div>
+
+<!-- Mobile Tab Bar (Visible only on small screens) -->
+<div
+  class="md:hidden fixed bottom-6 left-6 right-6 glass-card border border-white/10 z-50 flex justify-around py-4 px-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[32px] backdrop-blur-2xl">
+  <a href="/profile"
+    class="flex flex-col items-center justify-center space-y-1 <%= currentPath === '/profile' ? 'text-white' : 'text-slate-500' %>">
+    <i class="far fa-user text-xl"></i>
+    <span class="text-[9px] font-black uppercase tracking-widest mt-1">Profile</span>
+  </a>
+  <a href="/orders"
+    class="flex flex-col items-center justify-center space-y-1 <%= currentPath === '/orders' ? 'text-white' : 'text-slate-500' %>">
+    <i class="fas fa-box-open text-xl"></i>
+    <span class="text-[9px] font-black uppercase tracking-widest mt-1">Orders</span>
+  </a>
+  <a href="/wallet"
+    class="flex flex-col items-center justify-center space-y-1 <%= currentPath === '/wallet' ? 'text-white drop-shadow-glow' : 'text-slate-500' %>">
+    <i class="fas fa-wallet text-xl"></i>
+    <span class="text-[9px] font-black uppercase tracking-widest mt-1">Wallet</span>
+  </a>
+  <a href="/logout" class="flex flex-col items-center justify-center space-y-1 text-red-500/70">
+    <i class="fas fa-sign-out-alt text-xl"></i>
+    <span class="text-[9px] font-black uppercase tracking-widest mt-1">Logout</span>
+  </a>
+</div>

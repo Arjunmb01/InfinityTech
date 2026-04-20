@@ -1,0 +1,191 @@
+<%- include('./partials/adminHeader.ejs') %>
+
+    <div class="flex min-h-screen gradient-bg animate-gradient">
+        <%- include('./partials/adminSidebar.ejs') %>
+
+            <div class="flex-1 overflow-x-hidden overflow-y-auto" style="margin-left: var(--sidebar-width, 16rem);">
+                <div class="container mx-auto px-6 py-8">
+                    <!-- Header Section -->
+                    <div class="flex justify-between items-center mb-8 animate-fade-in-up">
+                        <h3
+                            class="text-3xl font-extrabold bg-gradient-to-r from-[#d4af37] to-[#f9e076] bg-clip-text text-transparent tracking-tight">
+                            Banner Management
+                        </h3>
+                        <a href="/admin/banners/add"
+                            class="golden-button flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f9e076] text-white transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add New Banner
+                        </a>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    <% if (success_msg) { %>
+                        <div class="mb-6 p-4 rounded-lg glass-effect text-green-300 border-green-500/50 fade-in">
+                            <%= success_msg %>
+                        </div>
+                        <% } %>
+                            <% if (error_msg) { %>
+                                <div class="mb-6 p-4 rounded-lg glass-effect text-red-300 border-red-500/50 fade-in">
+                                    <%= error_msg %>
+                                </div>
+                                <% } %>
+
+                                    <!-- Banners Table -->
+                                    <div class="glass-effect rounded-2xl p-6 animate-fade-in-up animation-delay-200">
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full">
+                                                <thead>
+                                                    <tr class="border-b border-white/10">
+                                                        <th class="text-left py-4 px-4 text-gray-300 font-semibold">
+                                                            Title</th>
+                                                        <th class="text-left py-4 px-4 text-gray-300 font-semibold">
+                                                            Description</th>
+                                                        <th class="text-center py-4 px-4 text-gray-300 font-semibold">
+                                                            Priority</th>
+                                                        <th class="text-center py-4 px-4 text-gray-300 font-semibold">
+                                                            Status</th>
+                                                        <th class="text-center py-4 px-4 text-gray-300 font-semibold">
+                                                            Valid Period</th>
+                                                        <th class="text-center py-4 px-4 text-gray-300 font-semibold">
+                                                            Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if (banners && banners.length> 0) { %>
+                                                        <% banners.forEach(banner=> { %>
+                                                            <tr
+                                                                class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                                <td class="py-4 px-4 text-white font-medium">
+                                                                    <%= banner.title %>
+                                                                </td>
+                                                                <td
+                                                                    class="py-4 px-4 text-gray-300 text-sm max-w-xs truncate">
+                                                                    <%= banner.description %>
+                                                                </td>
+                                                                <td class="py-4 px-4 text-center text-white">
+                                                                    <%= banner.priority %>
+                                                                </td>
+                                                                <td class="py-4 px-4 text-center">
+                                                                    <span
+                                                                        class="px-3 py-1 rounded-full text-xs font-semibold <%= banner.isActive ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300' %>">
+                                                                        <%= banner.isActive ? 'Active' : 'Inactive' %>
+                                                                    </span>
+                                                                </td>
+                                                                <td class="py-4 px-4 text-center text-gray-300 text-sm">
+                                                                    <%= new Date(banner.startDate).toLocaleDateString()
+                                                                        %>
+                                                                        <% if (banner.endDate) { %>
+                                                                            - <%= new
+                                                                                Date(banner.endDate).toLocaleDateString()
+                                                                                %>
+                                                                                <% } else { %>
+                                                                                    - Ongoing
+                                                                                    <% } %>
+                                                                </td>
+                                                                <td class="py-4 px-4">
+                                                                    <div
+                                                                        class="flex items-center justify-center space-x-2">
+                                                                        <button
+                                                                            onclick="toggleBanner('<%= banner._id %>', <%= banner.isActive %>)"
+                                                                            class="p-2 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors"
+                                                                            title="Toggle Status">
+                                                                            <i
+                                                                                class="fas <%= banner.isActive ? 'fa-toggle-on' : 'fa-toggle-off' %>"></i>
+                                                                        </button>
+                                                                        <a href="/admin/banners/edit/<%= banner._id %>"
+                                                                            class="p-2 rounded-lg bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 transition-colors"
+                                                                            title="Edit">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </a>
+                                                                        <button
+                                                                            onclick="deleteBanner('<%= banner._id %>')"
+                                                                            class="p-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors"
+                                                                            title="Delete">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <% }); %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="6"
+                                                                            class="py-12 text-center text-gray-400">
+                                                                            <i
+                                                                                class="fas fa-inbox text-4xl mb-4 block"></i>
+                                                                            No banners found. Create your first banner!
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function toggleBanner(id, currentStatus) {
+            try {
+                const response = await fetch(`/admin/banners/toggle/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Failed to toggle banner status', 'error');
+            }
+        }
+
+        async function deleteBanner(id) {
+            const result = await Swal.fire({
+                title: 'Delete Banner?',
+                text: 'This action cannot be undone',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, delete it'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/banners/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: data.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Failed to delete banner', 'error');
+                }
+            }
+        }
+    </script>
+
+    <%- include('./partials/adminFooter.ejs') %>

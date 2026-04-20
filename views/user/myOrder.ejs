@@ -1,0 +1,235 @@
+<%- include('../partials/header') %>
+
+    <div class="bg-[#F8FAFC] min-h-screen">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Sidebar -->
+                <%- include('../partials/profileSideBar', { path: '/orders' }) %>
+
+                    <!-- Main Content -->
+                    <main class="flex-1 min-w-0">
+                        <div class="mb-8">
+                            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">My Orders</h1>
+                            <p class="text-slate-500 text-sm">Track your shipments and view order history.</p>
+                        </div>
+
+                        <% if (orders && orders.length> 0) { %>
+                            <div class="space-y-6">
+                                <% orders.forEach(order=> { %>
+                                    <div
+                                        class="bg-white rounded-xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden transition-all hover:shadow-md">
+                                        <div
+                                            class="px-6 py-4 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/30">
+                                            <div
+                                                class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm">
+                                                <div>
+                                                    <span
+                                                        class="text-slate-500 block text-xs uppercase tracking-wider">Order
+                                                        Placed</span>
+                                                    <span class="text-slate-900 font-medium">
+                                                        <%= order.orderDate.toLocaleDateString() %>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span
+                                                        class="text-slate-500 block text-xs uppercase tracking-wider">Order
+                                                        #</span>
+                                                    <span class="text-slate-900 font-medium">
+                                                        <%= order._id %>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span
+                                                        class="text-slate-500 block text-xs uppercase tracking-wider">Total</span>
+                                                    <span class="text-slate-900 font-medium">₹<%=
+                                                            order.orderAmount.toFixed(2) %></span>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col items-end gap-2">
+                                                <a href="/orders/<%= order._id %>" class="btn-text text-sm font-medium">
+                                                    View Details
+                                                </a>
+                                                <% if (order.paymentMethod==='razorpay' &&
+                                                    order.paymentStatus==='pending' ) { %>
+                                                    <button
+                                                        class="retry-payment btn-primary px-4 py-1.5 text-xs rounded-full"
+                                                        data-order-id="<%= order._id %>"
+                                                        data-amount="<%= order.orderAmount %>"
+                                                        data-razorpay-order-id="<%= order.razorpayOrderId %>"
+                                                        data-address-id="<%= order.deliveryAddress._id %>"
+                                                        data-coupon-code="<%= order.couponCode || '' %>"
+                                                        data-coupon-discount="<%= order.couponDiscount || 0 %>">
+                                                        Retry Payment
+                                                    </button>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-6">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-2 h-2 rounded-full 
+                                                <%= order.status === 'Delivered' ? 'bg-green-500' : 
+                                                   order.status === 'Cancelled' ? 'bg-red-500' : 
+                                                   order.status === 'Pending' ? 'bg-yellow-500' : 'bg-blue-500' %>">
+                                                    </div>
+                                                    <span class="text-sm font-bold text-slate-900">
+                                                        <%= order.status %>
+                                                    </span>
+                                                    <% if (order.paymentStatus !=='paid' && order.status !=='Cancelled'
+                                                        ) { %>
+                                                        <span
+                                                            class="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full border border-orange-100 uppercase tracking-wide">Payment
+                                                            Pending</span>
+                                                        <% } %>
+                                                </div>
+                                            </div>
+
+                                            <!-- Simplified Item Preview (Just first few items) -->
+                                            <div class="flex flex-wrap gap-4">
+                                                <% order.orderedItems.slice(0, 4).forEach(item=> { %>
+                                                    <div class="relative w-16 h-16 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center overflow-hidden"
+                                                        title="<%= item.product.name %>">
+                                                        <img src="<%= item.product.images[0] %>" alt=""
+                                                            class="max-w-full max-h-full object-contain">
+                                                        <% if (item.quantity> 1) { %>
+                                                            <span
+                                                                class="absolute -top-2 -right-2 bg-slate-900 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                                                                <%= item.quantity %>
+                                                            </span>
+                                                            <% } %>
+                                                    </div>
+                                                    <% }) %>
+                                                        <% if (order.orderedItems.length> 4) { %>
+                                                            <div
+                                                                class="w-16 h-16 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 text-xs font-medium">
+                                                                +<%= order.orderedItems.length - 4 %>
+                                                            </div>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } else { %>
+                                <div class="text-center py-20 bg-white rounded-xl border border-slate-100">
+                                    <div
+                                        class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                                        <i class="fas fa-box-open text-3xl"></i>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-900 mb-2">No orders yet</h3>
+                                    <p class="text-slate-500 mb-8 max-w-sm mx-auto">When you place an order, it will
+                                        appear here.</p>
+                                    <a href="/shop" class="btn-primary">Start Shopping</a>
+                                </div>
+                                <% } %>
+                    </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Minimal SweetAlert Theme
+        const swalConfig = {
+            customClass: {
+                popup: 'bg-white rounded-xl shadow-xl border border-slate-100',
+                title: 'text-slate-900 font-bold',
+                confirmButton: 'btn-primary px-6 py-2 rounded-lg border-none shadow-none',
+                cancelButton: 'text-slate-500 hover:text-slate-900 font-medium px-4 py-2'
+            },
+            buttonsStyling: false
+        };
+
+        // Retry Payment Logic (Reused)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.retry-payment').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const { orderId, amount, razorpayOrderId, addressId, couponCode, couponDiscount } = e.target.dataset;
+                    const originalText = button.textContent;
+                    button.disabled = true;
+                    button.textContent = 'Processing...';
+
+                    try {
+                        // 1. Fetch new Razorpay Order Config
+                        const response = await fetch('/checkout/create-razorpay-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                addressId, couponCode, couponDiscount
+                                // Need to ensure backend handles retry/existing order appropriately if meant to reuse
+                                // Assuming create-razorpay-order logic handles this
+                            }),
+                        });
+                        const order = await response.json();
+
+                        if (!response.ok || !order.success) throw new Error(order.message || 'Creation failed');
+
+                        const options = {
+                            key: order.key,
+                            amount: order.amount,
+                            currency: 'INR',
+                            order_id: order.orderId,
+                            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InRyYW5zcGFyZW50Ii8+PC9zdmc+', // Transparent 1x1 image to prevent EMPTY_WORDMARK error
+                            handler: async (response) => {
+                                // 2. Verify Payment
+                                try {
+                                    const verifyResponse = await fetch('/verify-payment', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_signature: response.razorpay_signature,
+                                            addressId,
+                                            totalAmount: order.amount / 100,
+                                            couponCode, couponDiscount,
+                                            // Pass original orderId if backend needs it to link
+                                        }),
+                                    });
+                                    const verifyResult = await verifyResponse.json();
+
+                                    if (verifyResponse.ok && verifyResult.success) {
+                                        Swal.fire({ ...swalConfig, icon: 'success', title: 'Payment Successful', timer: 2000, showConfirmButton: false })
+                                            .then(() => window.location.reload());
+                                    } else {
+                                        throw new Error(verifyResult.message || 'Verification failed');
+                                    }
+                                } catch (err) {
+                                    Swal.fire({ ...swalConfig, icon: 'error', title: 'Payment Failed', text: 'Verification failed' });
+                                }
+                            },
+                            prefill: {
+                                name: '<%= user.name %>',
+                                email: '<%= user.email %>',
+                                contact: '<%= user.phone || "" %>',
+                            },
+                            theme: { color: '#2563EB' },
+                            modal: {
+                                ondismiss: () => {
+                                    button.disabled = false;
+                                    button.textContent = originalText;
+                                }
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.on('payment.failed', () => {
+                            Swal.fire({ ...swalConfig, icon: 'error', title: 'Payment Failed' });
+                            button.disabled = false;
+                            button.textContent = originalText;
+                        });
+                        rzp.open();
+
+                    } catch (err) {
+                        Swal.fire({ ...swalConfig, icon: 'error', title: 'Error', text: err.message });
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
+                });
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

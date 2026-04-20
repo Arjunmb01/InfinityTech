@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - InfinityTech</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+        }
+        .btn-premium {
+            background: #6366f1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-premium:hover {
+            background: #4f46e5;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        .shadow-glow {
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-[#09090b] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-indigo-600/5 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-900/5 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="flex min-h-screen items-center justify-center p-6 relative z-10 py-12">
+        <!-- Signup Card -->
+        <div class="w-full max-w-md glass-card p-10 border-white/5">
+            <div class="text-center mb-10">
+                <a href="/" class="inline-block mb-10 group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
+                            <i class="fas fa-microchip text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-black text-white tracking-tighter uppercase">Infinity<span class="text-indigo-500">Tech</span></span>
+                    </div>
+                </a>
+                <h1 class="text-3xl font-black text-white tracking-tighter uppercase mb-2">Create <span class="text-indigo-500">Account</span></h1>
+                <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.3em]">Join the premium tech community</p>
+            </div>
+
+            <form id="signupForm" class="space-y-6" method="POST">
+                <div class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Full Name</label>
+                        <input id="name" name="name" type="text" required
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all focus:ring-2 focus:ring-indigo-500/30"
+                            placeholder="e.g. John Doe">
+                        <p id="nameError" class="hidden text-red-500 text-[9px] font-black uppercase tracking-widest mt-2 px-1"></p>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Email Address</label>
+                        <input id="email" name="email" type="email" required
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all focus:ring-2 focus:ring-indigo-500/30"
+                            placeholder="e.g. user@example.com">
+                        <p id="emailError" class="hidden text-red-500 text-[9px] font-black uppercase tracking-widest mt-2 px-1"></p>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" required
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all focus:ring-2 focus:ring-indigo-500/30"
+                            placeholder="+91 0000000000">
+                        <p id="phoneError" class="hidden text-red-500 text-[9px] font-black uppercase tracking-widest mt-2 px-1"></p>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Password</label>
+                        <div class="relative">
+                            <input id="password" name="password" type="password" required
+                                class="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all focus:ring-2 focus:ring-indigo-500/30"
+                                placeholder="Min. 8 characters">
+                            <button type="button" onclick="togglePassword('password', 'toggleIcon1')"
+                                class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-700 hover:text-white transition-colors">
+                                <i id="toggleIcon1" class="far fa-eye text-xs"></i>
+                            </button>
+                        </div>
+                        <p id="passwordError" class="hidden text-red-500 text-[9px] font-black uppercase tracking-widest mt-2 px-1"></p>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-[10px) font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Verify Password</label>
+                        <div class="relative">
+                            <input id="confirmPassword" name="confirmPassword" type="password" required
+                                class="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all focus:ring-2 focus:ring-indigo-500/30"
+                                placeholder="Re-enter password">
+                            <button type="button" onclick="togglePassword('confirmPassword', 'toggleIcon2')"
+                                class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-700 hover:text-white transition-colors">
+                                <i id="toggleIcon2" class="far fa-eye text-xs"></i>
+                            </button>
+                        </div>
+                        <p id="confirmPasswordError" class="hidden text-red-500 text-[9px] font-black uppercase tracking-widest mt-2 px-1"></p>
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit" class="btn-premium w-full py-5 text-[11px] font-black uppercase tracking-[0.3em] rounded-2xl shadow-glow text-white border-none cursor-pointer">
+                        Sign Up
+                    </button>
+                </div>
+
+                <p class="text-[9px] text-center text-slate-700 font-black uppercase tracking-widest leading-loose">
+                    By signing up, you agree to our <a href="#" class="text-indigo-500 hover:text-white transition-all underline underline-offset-8 decoration-indigo-500/20">Terms</a> and <a href="#" class="text-indigo-500 hover:text-white transition-all underline underline-offset-8 decoration-indigo-500/20">Privacy Policy</a>
+                </p>
+            </form>
+
+            <div class="mt-12 text-center">
+                <p class="text-[10px] font-black text-slate-700 uppercase tracking-widest">
+                    Already have an account?
+                    <a href="/login" class="text-indigo-500 hover:text-white transition-all ml-2 underline underline-offset-8 decoration-indigo-500/20">Sign In</a>
+                </p>
+            </div>
+        </div>
+
+        <a href="/" class="absolute top-10 right-10 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-700 hover:text-white hover:bg-red-500/10 hover:border-red-500/50 transition-all group">
+            <i class="fas fa-times text-lg group-hover:rotate-90 transition-transform"></i>
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, password, confirmPassword })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    if (result.errors) {
+                        Object.keys(result.errors).forEach(field => {
+                            const errorElement = document.getElementById(`${field}Error`);
+                            if (errorElement) {
+                                errorElement.textContent = result.errors[field];
+                                errorElement.classList.remove('hidden');
+                            }
+                        });
+                    }
+                    Swal.fire({
+                        icon: 'error', title: 'Signup Failed', text: result.message,
+                        timer: 2000, showConfirmButton: false, background: '#0a0a0a', color: '#fff'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success', 
+                        title: result.devOtp ? `DEV MODE: ${result.devOtp}` : 'Account Created!', 
+                        text: result.message,
+                        timer: 5000, showConfirmButton: true, background: '#0a0a0a', color: '#fff'
+                    }).then(() => {
+                        window.location.href = result.redirect;
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error', title: 'Error', text: 'An unexpected error occurred.',
+                    timer: 2000, showConfirmButton: false, background: '#0a0a0a', color: '#fff'
+                });
+            }
+        });
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+</body>
+
+</html>

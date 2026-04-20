@@ -1,0 +1,337 @@
+<%- include('../partials/header') %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<div class="bg-onyx-950 min-h-screen py-12">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Sidebar -->
+            <%- include('../partials/profileSideBar', { path: '/orders' }) %>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                <div class="mb-12">
+                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">
+                        Order <span class="text-indigo-500">History</span>
+                    </h1>
+                    <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mt-2">Review your previous purchases and tracking.</p>
+                </div>
+
+                <% if (typeof message !=='undefined' && message) { %>
+                    <div class="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-6 py-4 rounded-2xl mb-8 flex items-center shadow-glow backdrop-blur-md">
+                        <i class="fas fa-info-circle mr-4 text-lg"></i>
+                        <span class="text-xs font-black uppercase tracking-widest"><%= message %></span>
+                    </div>
+                <% } %>
+
+                <% if (!orders || orders.length===0) { %>
+                    <div class="text-center py-32 glass-card border-dashed border-white/10">
+                        <div class="w-20 h-20 bg-indigo-600/10 rounded-full flex items-center justify-center mx-auto mb-8 text-indigo-500 border border-indigo-500/20 shadow-glow">
+                            <i class="fas fa-box-open text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter">No Orders Yet</h3>
+                        <p class="text-slate-500 mb-10 font-bold uppercase tracking-widest text-[10px]">You haven't placed any orders yet.</p>
+                        <a href="/shop" class="btn-premium px-10 py-5 text-[10px] font-black uppercase tracking-widest">
+                            Start Shopping
+                        </a>
+                    </div>
+                <% } else { %>
+                    <div class="space-y-10">
+                        <% orders.forEach(order=> { %>
+                            <% if (order && order._id) { %>
+                                <div class="glass-card overflow-hidden border-white/5 group hover:border-indigo-500/30 transition-all duration-500">
+                                    <!-- Order Header -->
+                                    <div class="px-8 py-6 bg-white/[0.02] border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                        <div class="flex flex-wrap gap-x-12 gap-y-4">
+                                            <div>
+                                                <span class="block text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1">Date</span>
+                                                <span class="text-white font-bold text-xs uppercase tracking-widest">
+                                                    <%= order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' , day: 'numeric' }) : 'N/A' %>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="block text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1">Order ID</span>
+                                                <span class="text-white font-black text-xs tracking-[0.2em] uppercase">
+                                                    #<%= order._id.toString().slice(-6) %>
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="block text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1">Total</span>
+                                                <span class="text-indigo-400 font-black text-sm tracking-tighter">
+                                                    ₹<%= order.orderAmount ? order.orderAmount.toLocaleString('en-IN') : '0.00' %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-glow
+                                                <%= order.status === 'Delivered' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 
+                                                   order.status === 'Cancelled' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
+                                                   order.status === 'Shipped' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                                                   'bg-amber-500/10 text-amber-400 border border-amber-500/20' %>">
+                                                <%= order.status || 'Pending' %>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Items -->
+                                    <div class="p-8 space-y-6">
+                                        <% order.products.forEach((product, index) => { %>
+                                            <div class="flex items-center gap-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                                                <div class="w-16 h-16 bg-white/5 rounded-xl overflow-hidden flex-shrink-0">
+                                                    <img src="<%= product.productId && product.productId.images && product.productId.images[0] ? product.productId.images[0].url : '/images/placeholder.png' %>" alt="Product" class="w-full h-full object-cover">
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-sm font-semibold text-white truncate">
+                                                        <%= product.productId && product.productId.name ? product.productId.name : 'Unknown Product' %>
+                                                    </h4>
+                                                    <p class="text-[10px] text-slate-500 mt-1 font-bold uppercase tracking-widest">
+                                                        Qty: <%= product.quantity %> &middot; ₹<%= product.totalPrice ? product.totalPrice.toFixed(2) : '0.00' %>
+                                                    </p>
+                                                    <p class="text-[9px] mt-1 font-black uppercase tracking-widest <%= product.status === 'Cancelled' ? 'text-red-500' : 'text-slate-600' %>">
+                                                        Status: <%= product.status %>
+                                                    </p>
+                                                </div>
+
+                                                <!-- Item Actions -->
+                                                <div class="flex flex-col gap-3">
+                                                    <% if (['Placed', 'Pending', 'Processing'].includes(order.status) && product.status==='Ordered') { %>
+                                                        <button data-modal-target="cancelProductModal-<%= order._id %>-<%= index %>"
+                                                            class="text-[9px] font-black text-red-500 hover:text-white hover:bg-red-500 border border-red-500/20 px-4 py-2 rounded-xl transition-all uppercase tracking-widest">
+                                                            Cancel Item
+                                                        </button>
+                                                    <% } %>
+                                                    <% if (order.status==='Delivered' && product.status==='Ordered') { %>
+                                                        <button data-modal-target="returnProductModal-<%= order._id %>-<%= index %>"
+                                                            class="text-[9px] font-black text-amber-500 hover:text-white hover:bg-amber-500 border border-amber-500/20 px-4 py-2 rounded-xl transition-all uppercase tracking-widest">
+                                                            Return Item
+                                                        </button>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+
+                                            <!-- Individual Product Models -->
+                                            <!-- Cancel Item Modal -->
+                                            <div id="cancelProductModal-<%= order._id %>-<%= index %>"
+                                                class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none modal-backdrop p-6">
+                                                <div class="glass-card w-full max-w-md p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+                                                    <h3 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter">Cancel <span class="text-red-500">Item</span></h3>
+                                                    <p class="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-widest leading-relaxed">Confirm removal of <span class="text-white"><%= product.productId && product.productId.name %></span>.</p>
+                                                    <form onsubmit="handleAction(event, '/api/orders/<%= order._id %>/cancel-product/<%= product.productId ? product.productId._id : '' %>', 'cancelProductModal-<%= order._id %>-<%= index %>')" class="space-y-6">
+                                                        <div>
+                                                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Reason</label>
+                                                            <select name="reason" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white appearance-none cursor-pointer focus:ring-2 focus:ring-red-500/30 transition-all uppercase tracking-widest">
+                                                                <option value="Changed my mind">Changed my mind</option>
+                                                                <option value="Found better price">Found better price</option>
+                                                                <option value="Other">Other</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex justify-end gap-6">
+                                                            <button type="button" class="text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-widest" data-modal-hide="cancelProductModal-<%= order._id %>-<%= index %>">Cancel</button>
+                                                            <button type="submit" class="btn-premium bg-red-600/10 border-red-500/20 text-red-500 hover:bg-red-600 hover:text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest shadow-glow">Confirm</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <!-- Return Item Modal -->
+                                            <div id="returnProductModal-<%= order._id %>-<%= index %>"
+                                                class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none modal-backdrop p-6">
+                                                <div class="glass-card w-full max-w-md p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+                                                    <h3 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter">Return <span class="text-amber-500">Process</span></h3>
+                                                    <p class="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-widest leading-relaxed">Request return for <span class="text-white"><%= product.productId && product.productId.name %></span>.</p>
+                                                    <form onsubmit="handleAction(event, '/api/orders/<%= order._id %>/return-product/<%= product.productId ? product.productId._id : '' %>', 'returnProductModal-<%= order._id %>-<%= index %>')" class="space-y-6">
+                                                        <div>
+                                                            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Reason for Return</label>
+                                                            <select name="reason" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white appearance-none cursor-pointer focus:ring-2 focus:ring-amber-500/30 transition-all uppercase tracking-widest">
+                                                                <option value="Damaged">Damaged on arrival</option>
+                                                                <option value="Defective">Defective product</option>
+                                                                <option value="Other">Other</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="flex justify-end gap-6">
+                                                            <button type="button" class="text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-widest" data-modal-hide="returnProductModal-<%= order._id %>-<%= index %>">Abort</button>
+                                                            <button type="submit" class="btn-premium bg-amber-600/10 border-amber-500/20 text-amber-500 hover:bg-amber-600 hover:text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest shadow-glow">Initiate</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+
+                                    <!-- Order Actions Footer -->
+                                    <div class="px-8 py-6 border-t border-white/5 flex flex-wrap gap-6 justify-end items-center">
+                                        <a href="/orders/<%= order._id %>" class="text-[10px] font-black text-slate-600 hover:text-white transition-all uppercase tracking-widest underline underline-offset-4 decoration-white/10 mr-4">View Details</a>
+
+                                        <% if (order.paymentStatus==='paid' && ['Processing', 'Shipped' , 'Out for Delivery', 'Delivered'].includes(order.status)) { %>
+                                            <a href="/orders/<%= order._id %>/invoice" class="btn-premium px-6 py-3 text-[9px] font-black uppercase tracking-widest bg-white/5 border border-white/10 hover:bg-white hover:text-onyx-950">Invoice</a>
+                                        <% } %>
+
+                                        <% if (order.paymentStatus==='failed' && order.status==='Pending') { %>
+                                            <button type="button" data-order-id="<%= order._id %>" class="retry-payment-btn btn-premium px-8 py-4 text-[9px] font-black uppercase tracking-widest bg-amber-600/10 border-amber-500/20 text-amber-500 hover:bg-amber-600 hover:text-white shadow-glow">Retry Payment</button>
+                                        <% } %>
+
+                                        <% if (order.status && ['Placed', 'Pending', 'Processing' , 'Shipped'].includes(order.status)) { %>
+                                            <button data-modal-target="cancelModal-<%= order._id %>" class="btn-premium px-8 py-4 text-[9px] font-black uppercase tracking-widest bg-red-600/10 border-red-500/20 text-red-500 hover:bg-red-600 hover:text-white">Cancel Order</button>
+                                        <% } else if (order.status === 'Delivered') { %>
+                                            <button data-modal-target="returnOrderModal-<%= order._id %>" class="btn-premium px-8 py-4 text-[9px] font-black uppercase tracking-widest bg-amber-600/10 border-amber-500/20 text-amber-500 hover:bg-amber-600 hover:text-white">Return Order</button>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <!-- Cancel ENTIRE Order Modal -->
+                                <div id="cancelModal-<%= order._id %>" class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none modal-backdrop p-6">
+                                    <div class="glass-card w-full max-w-md p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+                                        <h2 class="text-sm font-black text-white uppercase tracking-[0.3em] mb-10">Cancel <span class="text-indigo-500">Order</span></h2>
+                                        <p class="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-widest leading-relaxed">This will permanently cancel your order <span class="text-white">#<%= order._id.toString().slice(-6) %></span>.</p>
+                                        <form onsubmit="handleAction(event, '/api/orders/<%= order._id %>/cancel', 'cancelModal-<%= order._id %>')" class="space-y-6">
+                                            <div>
+                                                <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Cancellation Reason</label>
+                                                <textarea name="reason" rows="3" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white placeholder-slate-800 transition-all uppercase tracking-widest" placeholder="..." required></textarea>
+                                            </div>
+                                            <div class="flex justify-end gap-6">
+                                                <button type="button" class="text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-widest" data-modal-hide="cancelModal-<%= order._id %>">Go Back</button>
+                                                <button type="submit" class="btn-premium bg-red-600/10 border-red-500/20 text-red-500 hover:bg-red-600 hover:text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest shadow-glow">Confirm Cancellation</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Return ENTIRE Order Modal -->
+                                <div id="returnOrderModal-<%= order._id %>" class="fixed inset-0 z-50 hidden flex items-center justify-center pointer-events-none modal-backdrop p-6">
+                                    <div class="glass-card w-full max-w-md p-10 transform scale-95 opacity-0 transition-all duration-500 pointer-events-auto border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl">
+                                        <h2 class="text-sm font-black text-white uppercase tracking-[0.3em] mb-10">Return <span class="text-amber-500">Order</span></h2>
+                                        <p class="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-widest leading-relaxed">Request return for the entire order <span class="text-white">#<%= order._id.toString().slice(-6) %></span>.</p>
+                                        <form onsubmit="handleAction(event, '/api/orders/<%= order._id %>/return', 'returnOrderModal-<%= order._id %>')" class="space-y-6">
+                                            <div>
+                                                <label class="block text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 ml-1">Return Reason</label>
+                                                <select name="reason" class="w-full bg-onyx-950 border border-white/10 rounded-2xl px-6 py-4 text-xs font-bold text-white appearance-none cursor-pointer focus:ring-2 focus:ring-amber-500/30 transition-all uppercase tracking-widest">
+                                                    <option value="Damaged">Damaged on arrival</option>
+                                                    <option value="Defective">Defective product</option>
+                                                    <option value="Wrong Item">Received wrong item</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div class="flex justify-end gap-6 pt-4">
+                                                <button type="button" class="text-[10px] font-black text-slate-600 hover:text-white uppercase tracking-widest" data-modal-hide="returnOrderModal-<%= order._id %>">Abort</button>
+                                                <button type="submit" class="btn-premium bg-amber-600/10 border-amber-500/20 text-amber-500 hover:bg-amber-600 hover:text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest shadow-glow">Confirm Return</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </main>
+        </div>
+    </div>
+</div>
+
+<div id="modalOverlay" class="fixed inset-0 bg-onyx-950/80 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="closeAllModals()"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function waitForRazorpay(callback) {
+        if (typeof Razorpay !== 'undefined') callback();
+        else setTimeout(() => waitForRazorpay(callback), 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const overlay = document.getElementById('modalOverlay');
+
+        window.toggleModal = (modalId, show) => {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            const content = modal.querySelector('div');
+            if (show) {
+                modal.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.replace('scale-95', 'scale-100');
+                    content.classList.replace('opacity-0', 'opacity-100');
+                    overlay.classList.remove('opacity-0');
+                }, 10);
+            } else {
+                content.classList.replace('scale-100', 'scale-95');
+                content.classList.replace('opacity-100', 'opacity-0');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    if (!document.querySelector('.modal-backdrop:not(.hidden)')) overlay.classList.add('hidden');
+                }, 400);
+            }
+        };
+
+        window.closeAllModals = () => {
+            document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(m => toggleModal(m.id, false));
+        };
+
+        document.querySelectorAll('[data-modal-target]').forEach(b => b.addEventListener('click', () => toggleModal(b.dataset.modalTarget, true)));
+        document.querySelectorAll('[data-modal-hide]').forEach(b => b.addEventListener('click', () => toggleModal(b.dataset.modalHide, false)));
+
+        waitForRazorpay(() => {
+            document.querySelectorAll('.retry-payment-btn').forEach(btn => {
+                btn.addEventListener('click', () => retryPayment(btn.dataset.orderId));
+            });
+        });
+    });
+
+    async function handleAction(event, url, modalId) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const reason = formData.get('reason');
+
+        try {
+            Swal.fire({ title: 'Processing...', text: 'Updating order status', didOpen: () => Swal.showLoading() });
+            
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason })
+            });
+            const result = await response.json();
+            
+            Swal.close();
+            if (!response.ok || !result.success) throw new Error(result.message || 'Action failed');
+
+            toggleModal(modalId, false);
+            Swal.fire({ icon: 'success', title: 'Success', text: result.message, timer: 1500, showConfirmButton: false })
+                .then(() => location.reload());
+        } catch (e) {
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message });
+        }
+    }
+
+    async function retryPayment(orderId) {
+        if (typeof Razorpay === 'undefined') return;
+        try {
+            Swal.fire({ title: 'Processing...', text: 'Connecting to secure payment gateway', didOpen: () => Swal.showLoading() });
+            const response = await fetch(`/retry-payment/${orderId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }});
+            const result = await response.json();
+            Swal.close();
+            if (!response.ok || !result.success) throw new Error(result.message);
+
+            const options = {
+                key: result.key, amount: result.amount, currency: 'INR', order_id: result.orderId,
+                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy5zMy5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InRyYW5zcGFyZW50Ii8+PC9zdmc+',
+                handler: async (resp) => {
+                    try {
+                        const vResp = await fetch('/verify-payment', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ razorpay_order_id: resp.razorpay_order_id, razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature, totalAmount: result.amount / 100 })
+                        });
+                        const vResult = await vResp.json();
+                        if (vResp.ok && vResult.success) {
+                            Swal.fire({ icon: 'success', title: 'Payment Successful', text: 'Your order is being processed.', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '/orders');
+                        } else throw new Error(vResult.message);
+                    } catch (e) { Swal.fire({ icon: 'error', title: 'Payment Failed', text: e.message }); }
+                },
+                prefill: { name: '<%= userProfile.name %>', email: '<%= userProfile.email %>', contact: '<%= userProfile.phone %>' },
+                theme: { color: '#6366f1' }
+            };
+            new Razorpay(options).open();
+        } catch (e) { Swal.fire({ icon: 'error', title: 'Error', text: e.message }); }
+    }
+</script>
+
+<%- include('../partials/footer') %>

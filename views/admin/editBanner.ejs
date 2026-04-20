@@ -1,0 +1,168 @@
+<%- include('./partials/adminHeader.ejs') %>
+
+    <div class="flex min-h-screen gradient-bg animate-gradient">
+        <%- include('./partials/adminSidebar.ejs') %>
+
+            <div class="flex-1 overflow-x-hidden overflow-y-auto" style="margin-left: var(--sidebar-width, 16rem);">
+                <div class="container mx-auto px-6 py-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3
+                            class="text-3xl font-extrabold bg-gradient-to-r from-[#d4af37] to-[#f9e076] bg-clip-text text-transparent">
+                            Edit Banner
+                        </h3>
+                        <a href="/admin/banners" class="golden-button px-4 py-2 rounded-lg">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Banners
+                        </a>
+                    </div>
+
+                    <div class="glass-effect rounded-2xl p-8 max-w-4xl mx-auto">
+                        <form id="bannerForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-white mb-2">Banner Title*</label>
+                                    <input type="text" id="title" name="title" value="<%= banner.title %>" required
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-white mb-2">Description*</label>
+                                    <textarea id="description" name="description" required rows="3"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white"><%= banner.description %></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Link URL</label>
+                                    <input type="text" id="link" name="link" value="<%= banner.link %>"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Button Text</label>
+                                    <input type="text" id="buttonText" name="buttonText"
+                                        value="<%= banner.buttonText %>"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Background Gradient</label>
+                                    <select id="backgroundColor" name="backgroundColor"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                        <option value="from-blue-600 to-purple-600"
+                                            <%=banner.backgroundColor==='from-blue-600 to-purple-600' ? 'selected' : ''
+                                            %>>Blue to Purple</option>
+                                        <option value="from-green-600 to-teal-600"
+                                            <%=banner.backgroundColor==='from-green-600 to-teal-600' ? 'selected' : ''
+                                            %>>Green to Teal</option>
+                                        <option value="from-red-600 to-pink-600"
+                                            <%=banner.backgroundColor==='from-red-600 to-pink-600' ? 'selected' : '' %>
+                                            >Red to Pink</option>
+                                        <option value="from-yellow-600 to-orange-600"
+                                            <%=banner.backgroundColor==='from-yellow-600 to-orange-600' ? 'selected'
+                                            : '' %>>Yellow to Orange</option>
+                                        <option value="from-indigo-600 to-blue-600"
+                                            <%=banner.backgroundColor==='from-indigo-600 to-blue-600' ? 'selected' : ''
+                                            %>>Indigo to Blue</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Icon (FontAwesome)</label>
+                                    <input type="text" id="icon" name="icon" value="<%= banner.icon %>"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Start Date</label>
+                                    <input type="datetime-local" id="startDate" name="startDate"
+                                        value="<%= new Date(banner.startDate).toISOString().slice(0, 16) %>"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">End Date (Optional)</label>
+                                    <input type="datetime-local" id="endDate" name="endDate"
+                                        value="<%= banner.endDate ? new Date(banner.endDate).toISOString().slice(0, 16) : '' %>"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-2">Priority</label>
+                                    <input type="number" id="priority" name="priority" value="<%= banner.priority %>"
+                                        min="0"
+                                        class="w-full px-4 py-3 rounded-lg bg-[var(--content-bg)] border border-white/10 text-white">
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="isActive" name="isActive" <%=banner.isActive ? 'checked'
+                                        : '' %>
+                                    class="h-4 w-4 text-[#d4af37] rounded">
+                                    <label for="isActive" class="ml-2 text-white">Active</label>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-4 mt-8">
+                                <a href="/admin/banners"
+                                    class="px-6 py-3 rounded-lg bg-gray-600 text-white hover:bg-gray-700">
+                                    Cancel
+                                </a>
+                                <button type="submit"
+                                    class="px-6 py-3 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#f9e076] text-white">
+                                    <i class="fas fa-save mr-2"></i> Update Banner
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('bannerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                link: document.getElementById('link').value,
+                buttonText: document.getElementById('buttonText').value,
+                backgroundColor: document.getElementById('backgroundColor').value,
+                icon: document.getElementById('icon').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value || null,
+                priority: document.getElementById('priority').value,
+                isActive: document.getElementById('isActive').checked
+            };
+
+            try {
+                const response = await fetch('/admin/banners/edit/<%= banner._id %>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/admin/banners';
+                    });
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Failed to update banner', 'error');
+            }
+        });
+    </script>
+
+    <%- include('./partials/adminFooter.ejs') %>

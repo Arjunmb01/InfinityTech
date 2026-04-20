@@ -1,0 +1,171 @@
+/* ===== InfinityTech - Minimal Luxury Theme ===== */
+
+/* Root Variables & Reset */
+:root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --bg-body: #F8FAFC;
+    --text-primary: #020617;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Typography Utilities ===== */
+.heading-luxury {
+    letter-spacing: -0.025em;
+    /* Tight tracking for modern feel */
+    font-weight: 700;
+    color: #020617;
+}
+
+.text-body {
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* ===== Component: Buttons ===== */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    /* 8px */
+    background-color: #2563EB;
+    color: white;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background-color: #1D4ED8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: #020617;
+    border: 1px solid #E2E8F0;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #000000;
+}
+
+.btn-text {
+    color: #2563EB;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.btn-text:hover {
+    color: #1D4ED8;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* ===== Component: Cards ===== */
+.card-luxury {
+    background-color: white;
+    border-radius: 1rem;
+    /* 16px */
+    border: 1px solid #F1F5F9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card-luxury:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    border-color: #E2E8F0;
+}
+
+/* ===== Form Elements ===== */
+.input-minimal {
+    width: 100%;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.95rem;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-minimal:focus {
+    outline: none;
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input-minimal::placeholder {
+    color: #94A3B8;
+}
+
+/* ===== Utilities ===== */
+.nav-link {
+    color: #475569;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #020617;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-sale {
+    background-color: #DCFCE7;
+    color: #16A34A;
+}
+
+.badge-new {
+    background-color: #E0F2FE;
+    color: #2563EB;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
