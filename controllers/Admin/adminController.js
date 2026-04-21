@@ -50,14 +50,14 @@ export const login = async (req, res) => {
             await admin.save();
 
             // Set tokens in HTTP-only cookies
-            res.cookie('accessToken', accessToken, {
+            res.cookie('adminAccessToken', accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
                 maxAge: 15 * 60 * 1000 // 15 minutes
             });
             
-            res.cookie('refreshToken', refreshToken, {
+            res.cookie('adminRefreshToken', refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
@@ -194,19 +194,19 @@ export const loadDashboard = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         // Clear JWT tokens from cookies
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('adminAccessToken');
+        res.clearCookie('adminRefreshToken');
         
         // Remove refresh token from database if admin is logged in via JWT
         if (req.admin && req.admin._id) {
-            const refreshToken = req.cookies?.refreshToken;
+            const refreshToken = req.cookies?.adminRefreshToken;
             if (refreshToken) {
                 await User.findByIdAndUpdate(req.admin._id, {
                     $pull: { refreshTokens: { token: refreshToken } }
                 });
             }
         } else if (req.session && req.session.admin) {
-            const refreshToken = req.cookies?.refreshToken;
+            const refreshToken = req.cookies?.adminRefreshToken;
             if (refreshToken) {
                 await User.findByIdAndUpdate(req.session.admin.id, {
                     $pull: { refreshTokens: { token: refreshToken } }

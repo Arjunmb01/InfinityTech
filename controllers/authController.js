@@ -72,7 +72,7 @@ export const refreshAccessToken = async (req, res) => {
         const accessToken = generateAccessToken(payload);
 
         // Set new access token in cookie
-        res.cookie('accessToken', accessToken, {
+        res.cookie('userAccessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -125,8 +125,8 @@ export const revokeRefreshToken = async (req, res) => {
         });
 
         // Clear cookies
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('userAccessToken');
+        res.clearCookie('userRefreshToken');
 
         return res.status(200).json({ 
             success: true, 
@@ -163,8 +163,8 @@ export const revokeAllRefreshTokens = async (req, res) => {
         });
 
         // Clear cookies
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('userAccessToken');
+        res.clearCookie('userRefreshToken');
 
         return res.status(200).json({ 
             success: true, 

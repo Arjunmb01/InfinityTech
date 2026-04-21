@@ -93,15 +93,22 @@ export const generateTokens = (user) => {
 /**
  * Extract token from Authorization header or cookies
  * @param {Object} req - Express request object
+ * @param {String} type - Context type ('user' or 'admin')
  * @returns {String|null} JWT token or null
  */
-export const extractToken = (req) => {
+export const extractToken = (req, type = 'user') => {
     // Check Authorization header (Bearer token)
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         return req.headers.authorization.substring(7);
     }
     
-    // Check cookies
+    // Check cookies based on type
+    const cookieName = type === 'admin' ? 'adminAccessToken' : 'userAccessToken';
+    if (req.cookies && req.cookies[cookieName]) {
+        return req.cookies[cookieName];
+    }
+    
+    // Backward compatibility for generic 'accessToken' cookie
     if (req.cookies && req.cookies.accessToken) {
         return req.cookies.accessToken;
     }
@@ -112,10 +119,17 @@ export const extractToken = (req) => {
 /**
  * Extract refresh token from cookies or body
  * @param {Object} req - Express request object
+ * @param {String} type - Context type ('user' or 'admin')
  * @returns {String|null} JWT refresh token or null
  */
-export const extractRefreshToken = (req) => {
-    // Check cookies first
+export const extractRefreshToken = (req, type = 'user') => {
+    // Check cookies first based on type
+    const cookieName = type === 'admin' ? 'adminRefreshToken' : 'userRefreshToken';
+    if (req.cookies && req.cookies[cookieName]) {
+        return req.cookies[cookieName];
+    }
+    
+    // Backward compatibility for generic 'refreshToken' cookie
     if (req.cookies && req.cookies.refreshToken) {
         return req.cookies.refreshToken;
     }

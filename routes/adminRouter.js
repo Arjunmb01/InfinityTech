@@ -16,87 +16,87 @@ import * as admin from '../middleware/adminAuth.js';
 
 // Admin Authentication Routes
 router.get('/pageerror', adminControllers.pageerror);
-router.get('/login', adminControllers.loadLogin);
-router.post('/login', adminControllers.login);
-router.get('/dashboard', admin.isAdmin, adminControllers.loadDashboard);
+router.get('/login', admin.adminGuest, adminControllers.loadLogin);
+router.post('/login', admin.adminGuest, adminControllers.login);
+router.get('/dashboard', admin.adminAuth, adminControllers.loadDashboard);
 router.get('/logout', adminControllers.logout);
 
 // Sales Report Routes (API Endpoints Only)
-router.get('/sales-report/data', admin.isAdmin, adminControllers.getSalesReport);
-router.get('/sales-report/download', admin.isAdmin, adminControllers.downloadSalesReport);
-router.get('/top-sellers', admin.isAdmin, adminControllers.getTopSellers);
-router.get('/detailed-orders', admin.isAdmin, adminControllers.getDetailedOrders);
+router.get('/sales-report/data', admin.adminAuth, adminControllers.getSalesReport);
+router.get('/sales-report/download', admin.adminAuth, adminControllers.downloadSalesReport);
+router.get('/top-sellers', admin.adminAuth, adminControllers.getTopSellers);
+router.get('/detailed-orders', admin.adminAuth, adminControllers.getDetailedOrders);
 
 // Coupon Application Route
-router.post('/apply-coupon', admin.isAdmin, adminControllers.applyCouponToOrder);
+router.post('/apply-coupon', admin.adminAuth, adminControllers.applyCouponToOrder);
 
 // User Management Routes
-router.get('/users', admin.isAdmin, customerController.customerInfo);
-router.put('/users/block/:id', admin.isAdmin, customerController.blockUser);
+router.get('/users', admin.adminAuth, customerController.customerInfo);
+router.put('/users/block/:id', admin.adminAuth, customerController.blockUser);
 
 // Category Management Routes
-router.get('/categories', admin.isAdmin, categoryController.categoryInfo);
-router.get('/categories/:id', admin.isAdmin, categoryController.getCategoryDetails);
-router.get('/addCategory', admin.isAdmin, categoryController.loadCategory);
-router.post('/addCategory', admin.isAdmin, categoryController.addCategory);
-router.get('/editCategory/:id', admin.isAdmin, categoryController.loadEditCategory);
-router.put('/updateCategory/:id', admin.isAdmin, categoryController.updateCategory);
-router.put('/toggleCategoryStatus/:id', admin.isAdmin, categoryController.toggleCategoryStatus);
+router.get('/categories', admin.adminAuth, categoryController.categoryInfo);
+router.get('/categories/:id', admin.adminAuth, categoryController.getCategoryDetails);
+router.get('/addCategory', admin.adminAuth, categoryController.loadCategory);
+router.post('/addCategory', admin.adminAuth, categoryController.addCategory);
+router.get('/editCategory/:id', admin.adminAuth, categoryController.loadEditCategory);
+router.put('/updateCategory/:id', admin.adminAuth, categoryController.updateCategory);
+router.put('/toggleCategoryStatus/:id', admin.adminAuth, categoryController.toggleCategoryStatus);
 
 // Product Management 
-router.get('/products', admin.isAdmin, productController.loadProduct);
-router.get('/addProduct', admin.isAdmin, productController.loadAddProduct);
-router.post('/addProduct', admin.isAdmin, upload, handleMulterError, productController.addProduct);
-router.get('/editProduct/:id', admin.isAdmin, productController.loadEditProduct);
-router.post('/editProduct/:id', admin.isAdmin, upload, handleMulterError, productController.updateProduct);
-router.post('/replaceProductImage/:productId', admin.isAdmin, upload, handleMulterError, productController.replaceProductImage);
-router.post('/products/:id/toggle-list', admin.isAdmin, productController.toggleListStatus);
-router.post('/products/:id/list', admin.isAdmin, productController.listProduct); // Explicit list
-router.post('/products/:id/unlist', admin.isAdmin, productController.unlistProduct); // Explicit unlist
-router.post('/products/:id/toggle-featured', admin.isAdmin, productController.toggleFeaturedStatus);
-router.post('/softDeleteProduct/:id', admin.isAdmin, productController.softDeleteProduct);
-router.post('/removeProductImage/:productId', admin.isAdmin, productController.removeProductImage);
+router.get('/products', admin.adminAuth, productController.loadProduct);
+router.get('/addProduct', admin.adminAuth, productController.loadAddProduct);
+router.post('/addProduct', admin.adminAuth, upload, handleMulterError, productController.addProduct);
+router.get('/editProduct/:id', admin.adminAuth, productController.loadEditProduct);
+router.post('/editProduct/:id', admin.adminAuth, upload, handleMulterError, productController.updateProduct);
+router.post('/replaceProductImage/:productId', admin.adminAuth, upload, handleMulterError, productController.replaceProductImage);
+router.post('/products/:id/toggle-list', admin.adminAuth, productController.toggleListStatus);
+router.post('/products/:id/list', admin.adminAuth, productController.listProduct); // Explicit list
+router.post('/products/:id/unlist', admin.adminAuth, productController.unlistProduct); // Explicit unlist
+router.post('/products/:id/toggle-featured', admin.adminAuth, productController.toggleFeaturedStatus);
+router.post('/softDeleteProduct/:id', admin.adminAuth, productController.softDeleteProduct);
+router.post('/removeProductImage/:productId', admin.adminAuth, productController.removeProductImage);
 
 // Order Management
-router.get('/orders', admin.isAdmin, orderController.getOrders);
-router.patch('/orders/:orderId/status', admin.isAdmin, orderController.toggleOrderStatus); // Standard status update
-router.patch('/orders/:orderId/payment-status', admin.isAdmin, orderController.updatePaymentStatus);
-router.patch('/orders/:orderId/product-status', admin.isAdmin, orderController.updateProductStatus);
-router.get('/orders/:orderId', admin.isAdmin, orderController.viewOrderDetails);
-router.post('/orders/:orderId/cancel-product', admin.isAdmin, orderController.cancelProduct);
-router.post('/orders/:orderId/return-product', admin.isAdmin, orderController.returnProduct);
-router.post('/orders/:orderId/approve-return', admin.isAdmin, orderController.approveReturn);
+router.get('/orders', admin.adminAuth, orderController.getOrders);
+router.patch('/orders/:orderId/status', admin.adminAuth, orderController.toggleOrderStatus); // Standard status update
+router.patch('/orders/:orderId/payment-status', admin.adminAuth, orderController.updatePaymentStatus);
+router.patch('/orders/:orderId/product-status', admin.adminAuth, orderController.updateProductStatus);
+router.get('/orders/:orderId', admin.adminAuth, orderController.viewOrderDetails);
+router.post('/orders/:orderId/cancel-product', admin.adminAuth, orderController.cancelProduct);
+router.post('/orders/:orderId/return-product', admin.adminAuth, orderController.returnProduct);
+router.post('/orders/:orderId/approve-return', admin.adminAuth, orderController.approveReturn);
 
 // Offer Management
-router.get('/offers', admin.isAdmin, offerController.getAllOffers);
-router.get('/offers/add', admin.isAdmin, offerController.getAddOffer);
-router.post('/offers/add', admin.isAdmin, offerController.postAddOffer);
-router.get('/offers/edit/:id', admin.isAdmin, offerController.getEditOffer);
-router.post('/offers/edit/:id', admin.isAdmin, offerController.postEditOffer);
-router.patch('/offers/toggle/:id', admin.isAdmin, offerController.toggleOfferStatus);
+router.get('/offers', admin.adminAuth, offerController.getAllOffers);
+router.get('/offers/add', admin.adminAuth, offerController.getAddOffer);
+router.post('/offers/add', admin.adminAuth, offerController.postAddOffer);
+router.get('/offers/edit/:id', admin.adminAuth, offerController.getEditOffer);
+router.post('/offers/edit/:id', admin.adminAuth, offerController.postEditOffer);
+router.patch('/offers/toggle/:id', admin.adminAuth, offerController.toggleOfferStatus);
 
 // Coupon Management
-router.get('/coupons', admin.isAdmin, couponController.getAllCoupon);
-router.get('/add-coupon', admin.isAdmin, couponController.getCreateCouponForm);
-router.post('/addCoupon', admin.isAdmin, couponController.postCreateCoupon);
-router.get('/editCoupon/:Id', admin.isAdmin, couponController.getEditCouponForm);
-router.post('/editCoupon/:Id', admin.isAdmin, couponController.updateCoupon);
-router.get('/deleteCoupon/:Id', admin.isAdmin, couponController.deleteCoupon);
-router.delete('/deleteCoupon/:Id', admin.isAdmin, couponController.deleteCoupon);
+router.get('/coupons', admin.adminAuth, couponController.getAllCoupon);
+router.get('/add-coupon', admin.adminAuth, couponController.getCreateCouponForm);
+router.post('/addCoupon', admin.adminAuth, couponController.postCreateCoupon);
+router.get('/editCoupon/:Id', admin.adminAuth, couponController.getEditCouponForm);
+router.post('/editCoupon/:Id', admin.adminAuth, couponController.updateCoupon);
+router.get('/deleteCoupon/:Id', admin.adminAuth, couponController.deleteCoupon);
+router.delete('/deleteCoupon/:Id', admin.adminAuth, couponController.deleteCoupon);
 
 // Return Request Management
-router.get('/return/requests', admin.isAdmin, returnController.getReturnRequests);
-router.post('/return/approve/:id', admin.isAdmin, returnController.approveReturnRequest);
-router.post('/return/reject/:id', admin.isAdmin, returnController.rejectReturnRequest);
-router.get('/return/order-details/:id', admin.isAdmin, returnController.getReturnRequestDetails);
+router.get('/return/requests', admin.adminAuth, returnController.getReturnRequests);
+router.post('/return/approve/:id', admin.adminAuth, returnController.approveReturnRequest);
+router.post('/return/reject/:id', admin.adminAuth, returnController.rejectReturnRequest);
+router.get('/return/order-details/:id', admin.adminAuth, returnController.getReturnRequestDetails);
 
 // Banner Management Routes
-router.get('/banners', admin.isAdmin, bannerController.getAllBanners);
-router.get('/banners/add', admin.isAdmin, bannerController.getAddBanner);
-router.post('/banners/add', admin.isAdmin, bannerController.createBanner);
-router.get('/banners/edit/:id', admin.isAdmin, bannerController.getEditBanner);
-router.post('/banners/edit/:id', admin.isAdmin, bannerController.updateBanner);
-router.patch('/banners/toggle/:id', admin.isAdmin, bannerController.toggleBannerStatus);
-router.delete('/banners/delete/:id', admin.isAdmin, bannerController.deleteBanner);
+router.get('/banners', admin.adminAuth, bannerController.getAllBanners);
+router.get('/banners/add', admin.adminAuth, bannerController.getAddBanner);
+router.post('/banners/add', admin.adminAuth, bannerController.createBanner);
+router.get('/banners/edit/:id', admin.adminAuth, bannerController.getEditBanner);
+router.post('/banners/edit/:id', admin.adminAuth, bannerController.updateBanner);
+router.patch('/banners/toggle/:id', admin.adminAuth, bannerController.toggleBannerStatus);
+router.delete('/banners/delete/:id', admin.adminAuth, bannerController.deleteBanner);
 
 export default router;

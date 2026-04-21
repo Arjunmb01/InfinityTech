@@ -14,7 +14,7 @@ import * as walletController from '../controllers/user/walletController.js';
 import * as paymentController from '../controllers/user/paymentController.js';
 import * as authController from '../controllers/authController.js';
 
-import { isAuthenticated, isNotAuthenticated, auth, authMiddleware } from '../middleware/auth.js';
+import { userGuest, userAuth, auth, authMiddleware } from '../middleware/auth.js';
 import passport from 'passport';
 
 // JWT Token Management Routes
@@ -24,10 +24,10 @@ router.post('/api/auth/revoke-all-tokens', authMiddleware, authController.revoke
 router.get('/api/auth/verify', authMiddleware, authController.verifyToken);
 
 // Authentication routes
-router.get('/signup', userController.loadSignup);
+router.get('/signup', userGuest, userController.loadSignup);
 router.post('/signup', userController.signup);
-router.get('/login', isAuthenticated, userController.loadLogin);
-router.post('/login', isAuthenticated, userController.login);
+router.get('/login', userGuest, userController.loadLogin);
+router.post('/login', userGuest, userController.login);
 router.get('/verifyOtp', userController.loadverifyOtp);
 router.post('/verifyOtp', userController.verifyOtp);
 router.post('/resendOtp', userController.resendOtp);

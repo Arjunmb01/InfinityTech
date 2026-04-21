@@ -1,9 +1,9 @@
 import User from "../models/userSchema.js";
 import { verifyAccessToken, extractToken } from "../utils/jwt.js";
 
-// For rendering pages - checks if JWT exists
-export const isAuthenticated = (req, res, next) => {
-    const token = extractToken(req);
+// For login/signup pages - ensures user is NOT logged in (Guest)
+export const userGuest = (req, res, next) => {
+    const token = extractToken(req, 'user');
     if (token) {
         try {
             const decoded = verifyAccessToken(token);
@@ -22,8 +22,9 @@ export const isAuthenticated = (req, res, next) => {
     next();
 };
 
-export const isNotAuthenticated = (req, res, next) => {
-    const token = extractToken(req);
+// For protected routes - ensures user IS logged in (Auth)
+export const userAuth = (req, res, next) => {
+    const token = extractToken(req, 'user');
     if (token) {
         try {
             const decoded = verifyAccessToken(token);
@@ -44,7 +45,7 @@ export const isNotAuthenticated = (req, res, next) => {
 
 export const authMiddleware = async (req, res, next) => {
     try {
-        const token = extractToken(req);
+        const token = extractToken(req, 'user');
         
         if (!token) {
             // Try session fallback
@@ -119,7 +120,7 @@ export const authMiddleware = async (req, res, next) => {
 
 export const auth = async (req, res, next) => {
     try {
-        const token = extractToken(req);
+        const token = extractToken(req, 'user');
         
         if (!token) {
             // Fallback to session

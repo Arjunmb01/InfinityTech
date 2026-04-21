@@ -86,14 +86,14 @@ export const login = async (req, res) => {
         await user.save();
 
         // Set tokens in HTTP-only cookies
-        res.cookie('accessToken', accessToken, {
+        res.cookie('userAccessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
-        res.cookie('refreshToken', refreshToken, {
+        res.cookie('userRefreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -274,14 +274,14 @@ export const verifyOtp = async (req, res) => {
         await newUser.save();
 
         // Set tokens in HTTP-only cookies
-        res.cookie('accessToken', accessToken, {
+        res.cookie('userAccessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
-        res.cookie('refreshToken', refreshToken, {
+        res.cookie('userRefreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -366,12 +366,12 @@ export const resendOtp = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         // Clear JWT tokens from cookies
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('userAccessToken');
+        res.clearCookie('userRefreshToken');
 
         // Remove refresh token from database if user is logged in via JWT
         if (req.user && req.user._id) {
-            const refreshToken = req.cookies?.refreshToken;
+            const refreshToken = req.cookies?.userRefreshToken;
             if (refreshToken) {
                 await User.findByIdAndUpdate(req.user._id, {
                     $pull: { refreshTokens: { token: refreshToken } }
@@ -514,39 +514,34 @@ export const handleGoogleCallback = async (req, res) => {
             return;
         }
 
-        // Generate JWT tokens
         const { accessToken, refreshToken } = generateTokens(user);
 
-        // Store refresh token in database
         user.refreshTokens = user.refreshTokens || [];
         user.refreshTokens.push({
             token: refreshToken,
             createdAt: new Date()
         });
 
-        // Keep only last 5 refresh tokens
         if (user.refreshTokens.length > 5) {
             user.refreshTokens = user.refreshTokens.slice(-5);
         }
 
         await user.save();
 
-        // Set tokens in HTTP-only cookies
-        res.cookie('accessToken', accessToken, {
+        res.cookie('userAccessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
-        res.cookie('refreshToken', refreshToken, {
+        res.cookie('userRefreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        // Keep session for backward compatibility
         req.session.user = {
             _id: user._id,
             name: user.name,
@@ -555,7 +550,8 @@ export const handleGoogleCallback = async (req, res) => {
         };
 
         req.flash('success', `Welcome back, ${user.name}!`);
-        return res.redirect('/');
+        const redirectUrl = process.env.CLIENT_URL || '/';
+        return res.redirect(redirectUrl);
     } catch (error) {
         console.error('Google callback error:', error);
         req.flash('error', 'Authentication failed. Please try again.');

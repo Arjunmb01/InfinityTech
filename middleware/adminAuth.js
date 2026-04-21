@@ -1,8 +1,8 @@
 import { verifyAccessToken, extractToken } from "../utils/jwt.js";
 
-export const isAdmin = async (req, res, next) => {
+export const adminAuth = async (req, res, next) => {
     try {
-        const token = extractToken(req);
+        const token = extractToken(req, 'admin');
 
         const unauthorized = () => {
             if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'))) {
@@ -40,9 +40,9 @@ export const isAdmin = async (req, res, next) => {
     }
 };
 
-export const isLogout = (req, res, next) => {
+export const adminGuest = (req, res, next) => {
     try {
-        const token = extractToken(req);
+        const token = extractToken(req, 'admin');
 
         if (token) {
             try {
