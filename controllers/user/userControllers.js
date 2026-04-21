@@ -551,6 +551,8 @@ export const handleGoogleCallback = async (req, res) => {
         };
 
         req.flash('success', `Welcome back, ${user.name}!`);
+        
+        // Dynamic redirect based on CLIENT_URL or fallback to relative '/'
         const redirectUrl = process.env.CLIENT_URL || '/';
         return res.redirect(redirectUrl);
     } catch (error) {
