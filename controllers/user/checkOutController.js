@@ -577,4 +577,4 @@ export const showOrderSuccess = async (req, res) => {
     console.error('Show order success error:', error);
     res.redirect('/orders');
   }
-};rts;
+};
