@@ -25,6 +25,15 @@ const returnSchema = new Schema({
         enum: ['Pending', 'Approved', 'Rejected'],
         default: 'Pending'
     },
+    refundMethod: {
+        type: String,
+        enum: ['wallet', 'original_source'],
+        default: 'wallet'
+    },
+    refundedAmount: {
+        type: Number,
+        default: 0
+    },
     createdAt: {
         type: Date,
         default: Date.now

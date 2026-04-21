@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
@@ -35,6 +37,11 @@
   --color-onyx-900: var(--bg-secondary);
   --color-onyx-800: var(--bg-tertiary);
   --color-accent-vivid: var(--accent-primary);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-color: var(--border-color);
   
   --font-display: "Outfit", sans-serif;
   --font-sans: "Inter", sans-serif;

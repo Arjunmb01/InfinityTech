@@ -1,9 +1,14 @@
 {
   "name": "infinitytech",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "start": "nodemon app",
+    "start": "node app.js",
+    "dev": "nodemon app",
+    "build": "npm run build:css",
     "build:css": "tailwindcss -i ./public/css/styles.css -o ./public/css/output.css",
     "watch:css": "tailwindcss -i ./public/css/styles.css -o ./public/css/output.css --watch"
   },
@@ -52,6 +57,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/cli": "^4.2.3",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.19",

@@ -45,12 +45,12 @@ const orderSchema = new Schema({
     }],
     status: {
         type: String,
-        enum: ["Placed", "Pending", "Processing", "Shipped", "Out for Delivery", "Delivered", "Cancelled"],
+        enum: ["Placed", "Pending", "Processing", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return Requested", "Return Approved", "Return Rejected", "Returned"],
         default: "Placed",
     },
     orderStatus: { // Requested field name
         type: String,
-        enum: ["Placed", "Shipped", "Delivered", "Cancelled"],
+        enum: ["Placed", "Shipped", "Delivered", "Cancelled", "Return Requested", "Return Approved", "Return Rejected", "Returned"],
         default: "Placed"
     },
     deliveryAddress: {

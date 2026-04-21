@@ -52,6 +52,7 @@
     .card {
       transition: all 0.3s ease;
       animation: fadeIn 0.5s ease-out forwards;
+      animation-delay: var(--delay, 0ms);
     }
 
     .card:hover {
@@ -158,7 +159,7 @@
     <!-- Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% returnRequests.forEach((request, index) => { %>
-        <div class="card glass-effect-dark rounded-xl overflow-hidden relative" style="animation-delay: <%= index * 100 %>ms">
+        <div class="card glass-effect-dark rounded-xl overflow-hidden relative" style="--delay: <%= index * 100 %>ms;">
           <div class="priority-indicator bg-[var(--accent-start)]"></div>
           <div class="p-6 pl-8">
             <!-- Header -->
@@ -297,24 +298,47 @@
           const form = this.closest('form');
           const action = this.querySelector('i').classList.contains('fa-check') ? 'approve' : 'reject';
 
-          const result = await Swal.fire({
-            title: `Are you sure you want to ${action} this return request?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d4af37',
-            cancelButtonColor: '#ef4444',
-            confirmButtonText: `Yes, ${action} it!`,
-            background: '#1e1e2f',
-            color: '#e5e7eb'
-          });
+          let refundMethod = 'original_source';
+          if (action === 'approve') {
+            const { value: method } = await Swal.fire({
+              title: 'Approve Return Request',
+              text: 'How would you like to process the refund?',
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonColor: '#d4af37',
+              cancelButtonColor: '#ef4444',
+              confirmButtonText: 'Original Source (Default)',
+              denyButtonText: 'Refund to Wallet',
+              showDenyButton: true,
+              background: '#1e1e2f',
+              color: '#e5e7eb'
+            });
 
-          if (result.isConfirmed) {
+            if (method === undefined) return; // Cancelled
+            if (method === false) refundMethod = 'wallet'; // Denied (Refund to Wallet)
+            // If confirmed, refundMethod stays 'original_source'
+          } else {
+            const result = await Swal.fire({
+              title: `Are you sure you want to ${action} this return request?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d4af37',
+              cancelButtonColor: '#ef4444',
+              confirmButtonText: `Yes, ${action} it!`,
+              background: '#1e1e2f',
+              color: '#e5e7eb'
+            });
+            if (!result.isConfirmed) return;
+          }
+
+          if (true) {
             this.classList.add('opacity-75');
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
               const response = await fetch(form.action, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refundMethod })
               });
               if (response.ok) {
                 Swal.fire({

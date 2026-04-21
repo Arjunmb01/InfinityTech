@@ -1,6 +1,7 @@
 const Return = require('../../models/returnSchema');
 const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
+const { initiateRazorpayRefund } = require('../../services/paymentService');
 const mongoose = require('mongoose');
 
 // Helper function to calculate refund amount with shipping and coupon distribution
@@ -128,7 +129,8 @@ exports.approveReturnRequest = async (req, res) => {
     session.startTransaction();
     try {
         const returnId = req.params.id;
-        console.log(`[Admin] Starting approval for return request: ${returnId}`);
+        const { refundMethod = 'original_source' } = req.body; // Default to original_source
+        console.log(`[Admin] Starting approval for return request: ${returnId}, Method: ${refundMethod}`);
 
         const returnRequest = await Return.findById(returnId);
         if (!returnRequest) {
@@ -176,25 +178,46 @@ exports.approveReturnRequest = async (req, res) => {
             order.orderStatus = 'Returned';
         }
 
-        console.log(`[Admin] Updating wallet for user ${targetUserId} with ₹${refundAmount}`);
-        const walletUpdate = await Wallet.findOneAndUpdate(
-            { userId: targetUserId },
-            {
-                $inc: { balance: refundAmount },
-                $push: {
-                    transactions: {
-                        amount: refundAmount,
-                        type: 'credit',
-                        description: `Refund for approved return #${returnId}`,
-                        date: new Date()
+        let refundProcessed = false;
+        let refundDescription = `Refund for approved return #${returnId}`;
+
+        // Attempt original source refund if requested and eligible
+        if (refundMethod === 'original_source' && order.paymentMethod === 'razorpay' && order.razorpayDetails?.paymentId) {
+            console.log(`[Admin] Attempting Razorpay refund for payment ${order.razorpayDetails.paymentId}`);
+            const razorpayResult = await initiateRazorpayRefund(order.razorpayDetails.paymentId, refundAmount);
+            
+            if (razorpayResult.success) {
+                returnRequest.refundMethod = 'original_source';
+                refundProcessed = true;
+                console.log(`[Admin] Razorpay refund successful`);
+            } else {
+                console.warn(`[Admin] Razorpay refund failed, falling back to wallet: ${razorpayResult.error}`);
+                refundDescription += ` (Razorpay refund failed: ${razorpayResult.error})`;
+            }
+        }
+
+        if (!refundProcessed) {
+            console.log(`[Admin] Updating wallet for user ${targetUserId} with ₹${refundAmount}`);
+            const walletUpdate = await Wallet.findOneAndUpdate(
+                { userId: targetUserId },
+                {
+                    $inc: { balance: refundAmount },
+                    $push: {
+                        transactions: {
+                            amount: refundAmount,
+                            type: 'credit',
+                            description: refundDescription,
+                            date: new Date()
+                        }
                     }
-                }
-            },
-            { upsert: true, new: true, session }
-        );
-        
-        if (!walletUpdate) {
-            throw new Error('Failed to update or create user wallet');
+                },
+                { upsert: true, new: true, session }
+            );
+            
+            if (!walletUpdate) {
+                throw new Error('Failed to update or create user wallet');
+            }
+            returnRequest.refundMethod = 'wallet';
         }
 
         await Promise.all([

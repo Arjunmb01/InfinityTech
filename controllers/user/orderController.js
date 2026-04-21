@@ -181,6 +181,7 @@ exports.returnOrder = async (req, res) => {
         });
 
         order.status = 'Return Requested';
+        order.orderStatus = 'Return Requested';
         order.returnReason = reason;
         order.returnRequestedAt = new Date();
 
@@ -227,6 +228,12 @@ exports.requestReturn = async (req, res) => {
         });
 
         order.products[productIndex].status = 'Return Requested';
+        
+        // Update order status if it was previously 'Delivered'
+        if (order.status === 'Delivered') {
+            order.status = 'Return Requested';
+            order.orderStatus = 'Return Requested';
+        }
         await returnRequest.save({ session });
         await order.save({ session });
         await session.commitTransaction();
