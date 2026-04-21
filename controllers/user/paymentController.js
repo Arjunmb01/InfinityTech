@@ -1,12 +1,12 @@
-const { createRazorpayInstance } = require('../../config/razorpay');
-const crypto = require('crypto');
-const Order = require('../../models/orderSchema');
-const Cart = require('../../models/cartSchema');
-const Address = require('../../models/addressSchema');
+import { createRazorpayInstance } from '../../config/razorpay.js';
+import crypto from 'crypto';
+import Order from '../../models/orderSchema.js';
+import Cart from '../../models/cartSchema.js';
+import Address from '../../models/addressSchema.js';
 
 const razorpayInstance = createRazorpayInstance();
 
-exports.createRazorpayOrder = async (req, res) => {
+export const createRazorpayOrder = async (req, res) => {
     try {
         console.log('Creating Razorpay order with body:', JSON.stringify(req.body, null, 2));
         const { addressId, couponCode, couponDiscount } = req.body;
@@ -54,7 +54,7 @@ exports.createRazorpayOrder = async (req, res) => {
     }
 };
 
-exports.verifyPayment = async (req, res) => {
+export const verifyPayment = async (req, res) => {
     try {
         console.log('Verifying Razorpay payment with body:', JSON.stringify(req.body, null, 2));
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, addressId, totalAmount } = req.body;

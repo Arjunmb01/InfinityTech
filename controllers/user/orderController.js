@@ -1,8 +1,8 @@
-const Order = require('../../models/orderSchema');
-const Wallet = require('../../models/walletSchema');
-const Return = require('../../models/returnSchema');
-const User = require('../../models/userSchema'); // Assuming a User model exists
-const mongoose = require('mongoose');
+import Order from '../../models/orderSchema.js';
+import Wallet from '../../models/walletSchema.js';
+import Return from '../../models/returnSchema.js';
+import User from '../../models/userSchema.js';
+import mongoose from 'mongoose';
 
 // Helper function to calculate proportional refund with coupon discount
 const calculateRefundAmount = (order, productIndex) => {
@@ -15,7 +15,7 @@ const calculateRefundAmount = (order, productIndex) => {
 };
 
 // Get user's order list
-exports.getOrdersList = async (req, res) => {
+export const getOrdersList = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         if (!userId) throw new Error('User not authenticated');
@@ -35,7 +35,7 @@ exports.getOrdersList = async (req, res) => {
 };
 
 // Get specific order details
-exports.getOrderDetails = async (req, res) => {
+export const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
         const userId = req.session.user?._id;
@@ -55,7 +55,7 @@ exports.getOrderDetails = async (req, res) => {
 };
 
 // Cancel entire order
-exports.cancelOrder = async (req, res) => {
+export const cancelOrder = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -106,7 +106,7 @@ exports.cancelOrder = async (req, res) => {
 };
 
 // Cancel individual product
-exports.cancelProduct = async (req, res) => {
+export const cancelProduct = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -155,7 +155,7 @@ exports.cancelProduct = async (req, res) => {
 };
 
 // Request return for entire order
-exports.returnOrder = async (req, res) => {
+export const returnOrder = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -199,7 +199,7 @@ exports.returnOrder = async (req, res) => {
 };
 
 // Request return for individual product
-exports.requestReturn = async (req, res) => {
+export const requestReturn = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -246,5 +246,3 @@ exports.requestReturn = async (req, res) => {
         session.endSession();
     }
 };
-
-module.exports = exports;

@@ -1,4 +1,4 @@
-function generateCouponCode(length = 8) {
+export default function generateCouponCode(length = 8) {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
@@ -10,5 +10,3 @@ function generateCouponCode(length = 8) {
 
     return couponCode;
 }
-
-module.exports = generateCouponCode;

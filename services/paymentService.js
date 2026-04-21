@@ -1,4 +1,4 @@
-const { createRazorpayInstance } = require('../config/razorpay');
+import { createRazorpayInstance } from '../config/razorpay.js';
 
 /**
  * Initiates a refund through Razorpay
@@ -6,7 +6,7 @@ const { createRazorpayInstance } = require('../config/razorpay');
  * @param {number} amount - The amount to refund (in INR)
  * @returns {Promise<object>} - The refund response from Razorpay
  */
-exports.initiateRazorpayRefund = async (paymentId, amount) => {
+export const initiateRazorpayRefund = async (paymentId, amount) => {
     try {
         const razorpay = createRazorpayInstance();
         

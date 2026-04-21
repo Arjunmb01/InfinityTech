@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 dotenv.config();
 
 // Create Nodemailer Transporter
@@ -19,7 +19,7 @@ const responseHandler = (success, message) => ({ success, message });
 /**
  * Send Verification OTP via Nodemailer
  */
-const sendVerificationEmail = async (email, otp) => {
+export const sendVerificationEmail = async (email, otp) => {
     try {
         if (process.env.NODE_ENV === 'development') {
             console.log('-----------------------------------------');
@@ -64,7 +64,7 @@ const sendVerificationEmail = async (email, otp) => {
 /**
  * Send Password Reset OTP
  */
-const sendResetEmail = async (email, otp) => {
+export const sendResetEmail = async (email, otp) => {
     try {
         if (process.env.NODE_ENV === 'development') {
             console.log('-----------------------------------------');
@@ -105,7 +105,7 @@ const sendResetEmail = async (email, otp) => {
 /**
  * Send Order Confirmation
  */
-const sendOrderConfirmationEmail = async (email, order) => {
+export const sendOrderConfirmationEmail = async (email, order) => {
     try {
         if (process.env.NODE_ENV === 'development') {
             console.log('-----------------------------------------');
@@ -145,10 +145,4 @@ const sendOrderConfirmationEmail = async (email, order) => {
         console.error('Nodemailer Error (Order):', error);
         return responseHandler(false, error.message);
     }
-};
-
-module.exports = {
-    sendVerificationEmail,
-    sendResetEmail,
-    sendOrderConfirmationEmail
 };

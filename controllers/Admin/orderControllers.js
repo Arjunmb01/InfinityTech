@@ -1,7 +1,7 @@
-const Order = require('../../models/orderSchema');
-const Wallet = require('../../models/walletSchema');
-const Return = require('../../models/returnSchema');
-const mongoose = require('mongoose');
+import Order from '../../models/orderSchema.js';
+import Wallet from '../../models/walletSchema.js';
+import Return from '../../models/returnSchema.js';
+import mongoose from 'mongoose';
 
 // Helper function to calculate proportional refund with coupon discount
 const calculateRefundAmount = (order, productIndex) => {
@@ -14,7 +14,7 @@ const calculateRefundAmount = (order, productIndex) => {
 };
 
 // Get all orders with filters and pagination
-exports.getOrders = async (req, res) => {
+export const getOrders = async (req, res) => {
     try {
         // Extract filter and pagination parameters from query
         const { search, status, startDate, endDate, page } = req.query;
@@ -78,7 +78,7 @@ exports.getOrders = async (req, res) => {
 
 
 // View specific order details
-exports.viewOrderDetails = async (req, res) => {
+export const viewOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId)
@@ -97,7 +97,7 @@ exports.viewOrderDetails = async (req, res) => {
 };
 
 // Toggle order status
-exports.toggleOrderStatus = async (req, res) => {
+export const toggleOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { status } = req.body;
@@ -141,7 +141,7 @@ exports.toggleOrderStatus = async (req, res) => {
 };
 
 // Cancel individual product
-exports.cancelProduct = async (req, res) => {
+export const cancelProduct = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -190,7 +190,7 @@ exports.cancelProduct = async (req, res) => {
 };
 
 // Request return for individual product
-exports.returnProduct = async (req, res) => {
+export const returnProduct = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { productIndex, reason } = req.body;
@@ -225,7 +225,7 @@ exports.returnProduct = async (req, res) => {
 };
 
 // Approve return for individual product
-exports.approveReturn = async (req, res) => {
+export const approveReturn = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -276,7 +276,7 @@ exports.approveReturn = async (req, res) => {
 };
 
 // Update payment status
-exports.updatePaymentStatus = async (req, res) => {
+export const updatePaymentStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { paymentStatus } = req.body;
@@ -298,7 +298,7 @@ exports.updatePaymentStatus = async (req, res) => {
 };
 
 // Update individual product status manually
-exports.updateProductStatus = async (req, res) => {
+export const updateProductStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { productIndex, status } = req.body;
@@ -322,5 +322,3 @@ exports.updateProductStatus = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
-module.exports = exports;

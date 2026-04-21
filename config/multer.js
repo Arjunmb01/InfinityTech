@@ -1,6 +1,10 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const createUploadDir = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
@@ -30,7 +34,7 @@ const storage = multer.diskStorage({
 });
 
 // Flexible Multer configuration to handle both multiple 'images' and single 'newImage'
-const uploadConfig = multer({
+export const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
@@ -41,7 +45,7 @@ const uploadConfig = multer({
     { name: 'newImage', maxCount: 1 } 
 ]);
 
-const handleMulterError = (err, req, res, next) => {
+export const handleMulterError = (err, req, res, next) => {
     if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ success: false, message: 'File too large. Maximum size is 5MB' });
@@ -55,9 +59,4 @@ const handleMulterError = (err, req, res, next) => {
         return res.status(400).json({ success: false, message: err.message });
     }
     next(err);
-};
-
-module.exports = {
-    upload: uploadConfig,
-    handleMulterError
 };

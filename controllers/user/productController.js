@@ -1,13 +1,13 @@
-const Product = require('../../models/productSchema');
-const LaptopCategory = require('../../models/categorySchema');
-const User = require('../../models/userSchema');
-const Cart = require('../../models/cartSchema');
-const Wishlist = require('../../models/wishlistSchema');
-const { getBestOfferForProduct } = require('../../utils/offer');
-const mongoose = require('mongoose');
+import Product from '../../models/productSchema.js';
+import LaptopCategory from '../../models/categorySchema.js';
+import User from '../../models/userSchema.js';
+import Cart from '../../models/cartSchema.js';
+import Wishlist from '../../models/wishlistSchema.js';
+import { getBestOfferForProduct } from '../../utils/offer.js';
+import mongoose from 'mongoose';
 
 // Get Home Page Products
-const getHomePageProducts = async (req, res) => {
+export const getHomePageProducts = async (req, res) => {
     try {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -85,7 +85,7 @@ const getHomePageProducts = async (req, res) => {
 };
 
 // Get Single Product Details
-const getSingleProduct = async (req, res) => {
+export const getSingleProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const product = await Product.findOne({
@@ -138,7 +138,7 @@ const getSingleProduct = async (req, res) => {
 };
 
 // Get All Categories
-const getAllCategories = async (req, res) => {
+export const getAllCategories = async (req, res) => {
     try {
         const categories = await LaptopCategory.find({ "status.isActive": true })
             .sort('name')
@@ -164,7 +164,7 @@ const getAllCategories = async (req, res) => {
 };
 
 // Get Category Products
-const getCategoryProducts = async (req, res) => {
+export const getCategoryProducts = async (req, res) => {
     try {
         const categoryId = req.params.id;
 
@@ -222,7 +222,7 @@ const getCategoryProducts = async (req, res) => {
 };
 
 // Load Shop Page
-const loadShop = async (req, res) => {
+export const loadShop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
@@ -370,7 +370,7 @@ const loadShop = async (req, res) => {
 };
 
 // Search Products
-const searchProducts = async (req, res) => {
+export const searchProducts = async (req, res) => {
     try {
         const searchQuery = req.query.q;
         const products = await Product.find({
@@ -411,7 +411,7 @@ const searchProducts = async (req, res) => {
 };
 
 // Add to Wishlist
-const addToWishlist = async (req, res) => {
+export const addToWishlist = async (req, res) => {
     try {
         const { productId } = req.body;
         const userId = req.session.user._id;
@@ -449,7 +449,7 @@ const addToWishlist = async (req, res) => {
 };
 
 // Get Product Stock
-const getProductStock = async (req, res) => {
+export const getProductStock = async (req, res) => {
     try {
         const { productId } = req.params;
         if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -467,7 +467,7 @@ const getProductStock = async (req, res) => {
 };
 
 // Advanced Product Listing (API)
-const getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
     try {
         const { category, price, sort, page = 1, limit = 20, ...attributes } = req.query;
 
@@ -493,14 +493,14 @@ const getProducts = async (req, res) => {
             if (price.lte) finalQuery.price.$lte = Number(price.lte);
         }
 
-        // 3. Dynamic Attribute Filtering
+        // Dynamic Attribute Filtering
         Object.keys(attributes).forEach(key => {
             if (!['page', 'limit', 'sort'].includes(key)) {
                 finalQuery[`attributes.${key}`] = attributes[key];
             }
         });
 
-        // 4. Sorting
+        // Sorting
         let sortOption = { createdAt: -1 };
         if (sort) {
             switch (sort) {
@@ -536,7 +536,7 @@ const getProducts = async (req, res) => {
     }
 };
 
-const getFeaturedProducts = async (req, res) => {
+export const getFeaturedProducts = async (req, res) => {
     try {
         const products = await Product.find({ "status.isFeatured": true, "status.isActive": true, "status.isDeleted": false })
             .limit(10)
@@ -545,17 +545,4 @@ const getFeaturedProducts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
-
-module.exports = {
-    getHomePageProducts,
-    getSingleProduct,
-    getAllCategories,
-    getCategoryProducts,
-    loadShop,
-    searchProducts,
-    addToWishlist,
-    getProductStock,
-    getProducts,
-    getFeaturedProducts
 };

@@ -1,6 +1,6 @@
-const Offer = require('../models/offerSchema');
+import Offer from '../models/offerSchema.js';
 
-async function getBestOfferForProduct(product) {
+export async function getBestOfferForProduct(product) {
     try {
         
         const basePrice = product.price || 0; // Ensure basePrice is not undefined or negative
@@ -84,5 +84,3 @@ async function getBestOfferForProduct(product) {
         };
     }
 }
-
-module.exports = { getBestOfferForProduct };

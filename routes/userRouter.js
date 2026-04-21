@@ -1,21 +1,21 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const userController = require('../controllers/user/userControllers');
-const profileController = require('../controllers/user/userProfileController');
-const productController = require('../controllers/user/productController');
-const addressController = require('../controllers/user/addressController');
-const cartController = require('../controllers/user/cartController');
-const checkoutController = require('../controllers/user/checkOutController');
-const orderController = require('../controllers/user/orderController');
-const passwordController = require('../controllers/user/password');
-const wishlist = require('../controllers/user/wishlistController');
-const walletController = require('../controllers/user/walletController');
-const paymentController = require('../controllers/user/paymentController');
-const authController = require('../controllers/authController');
+import * as userController from '../controllers/user/userControllers.js';
+import * as profileController from '../controllers/user/userProfileController.js';
+import * as productController from '../controllers/user/productController.js';
+import * as addressController from '../controllers/user/addressController.js';
+import * as cartController from '../controllers/user/cartController.js';
+import * as checkoutController from '../controllers/user/checkOutController.js';
+import * as orderController from '../controllers/user/orderController.js';
+import * as passwordController from '../controllers/user/password.js';
+import * as wishlist from '../controllers/user/wishlistController.js';
+import * as walletController from '../controllers/user/walletController.js';
+import * as paymentController from '../controllers/user/paymentController.js';
+import * as authController from '../controllers/authController.js';
 
-const { isAuthenticated, isNotAuthenticated, auth, authMiddleware } = require('../middleware/auth');
-const passport = require('passport');
+import { isAuthenticated, isNotAuthenticated, auth, authMiddleware } from '../middleware/auth.js';
+import passport from 'passport';
 
 // JWT Token Management Routes
 router.post('/api/auth/refresh-token', authController.refreshAccessToken);
@@ -120,4 +120,4 @@ router.get('/api/user/wishlist/products', auth, wishlist.getWishlistProductIds);
 router.get('/wallet', auth, walletController.getWallet);
 router.get('/wallet/history', auth, walletController.getTransactionHistory);
 
-module.exports = router;
+export default router;

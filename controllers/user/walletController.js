@@ -1,8 +1,8 @@
-const Wallet = require('../../models/walletSchema');
-const Users = require('../../models/userSchema');
-const Category = require('../../models/categorySchema');
+import Wallet from '../../models/walletSchema.js';
+import Users from '../../models/userSchema.js';
+import Category from '../../models/categorySchema.js';
 
-exports.getWallet = async (req, res, next) => {
+export const getWallet = async (req, res, next) => {
     try {
         const userId = req.session.user?._id;
         if (!userId) {
@@ -56,7 +56,7 @@ exports.getWallet = async (req, res, next) => {
     }
 };
 
-exports.getWalletDetails = async (req, res, next) => {
+export const getWalletDetails = async (req, res, next) => {
     try {
         let wallet = await Wallet.findOne({ userId: req.user._id });
 
@@ -88,7 +88,7 @@ exports.getWalletDetails = async (req, res, next) => {
     }
 };
 
-exports.getTransactionHistory = async (req, res, next) => {
+export const getTransactionHistory = async (req, res, next) => {
     try {
         const sessionUserId = req.session.user?._id;
         if (!sessionUserId) {
@@ -132,7 +132,7 @@ exports.getTransactionHistory = async (req, res, next) => {
     }
 };
 
-exports.refundToWallet = async (orderId, userId, amount, description) => {
+export const refundToWallet = async (orderId, userId, amount, description) => {
     try {
         let wallet = await Wallet.findOne({ userId });
 

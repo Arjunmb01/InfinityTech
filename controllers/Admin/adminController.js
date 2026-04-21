@@ -1,18 +1,18 @@
-const User = require('../../models/userSchema');
-const Order = require('../../models/orderSchema');
-const Coupon = require('../../models/coupounSchema');
-const Return = require('../../models/returnSchema');
-const bcrypt = require('bcrypt');
-const PDFDocument = require('pdfkit');
-const ExcelJS = require('exceljs');
-const QuickChart = require('quickchart-js');
-const { generateTokens } = require('../../utils/jwt');
+import User from '../../models/userSchema.js';
+import Order from '../../models/orderSchema.js';
+import Coupon from '../../models/coupounSchema.js';
+import Return from '../../models/returnSchema.js';
+import bcrypt from 'bcrypt';
+import PDFDocument from 'pdfkit';
+import ExcelJS from 'exceljs';
+import QuickChart from 'quickchart-js';
+import { generateTokens } from '../../utils/jwt.js';
 
-const pageerror = async (req, res) => {
+export const pageerror = async (req, res) => {
     res.render('admin-error');
 };
 
-const loadLogin = (req, res) => {
+export const loadLogin = (req, res) => {
     try {
         if (req.session.admin) return res.redirect('/admin/dashboard');
         res.render('adminLogin', { message: null });
@@ -22,7 +22,7 @@ const loadLogin = (req, res) => {
     }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) return res.render('adminLogin', { message: 'Email and password are required' });
@@ -82,7 +82,7 @@ const login = async (req, res) => {
     }
 };
 
-const applyCouponToOrder = async (req, res) => {
+export const applyCouponToOrder = async (req, res) => {
     try {
         const { orderId, couponCode } = req.body;
         const adminId = req.session.admin?.id;
@@ -131,7 +131,7 @@ const applyCouponToOrder = async (req, res) => {
     }
 };
 
-const loadDashboard = async (req, res) => {
+export const loadDashboard = async (req, res) => {
     try {
         if (!req.session.admin) return res.redirect('/admin/login');
 
@@ -191,7 +191,7 @@ const loadDashboard = async (req, res) => {
     }
 };
 
-const logout = async (req, res) => {
+export const logout = async (req, res) => {
     try {
         // Clear JWT tokens from cookies
         res.clearCookie('accessToken');
@@ -232,7 +232,7 @@ const logout = async (req, res) => {
     }
 };
 
-const getSalesReport = async (req, res) => {
+export const getSalesReport = async (req, res) => {
     try {
         const { startDate, endDate, timeFrame = 'daily' } = req.query;
         const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 30));
@@ -290,7 +290,7 @@ const getSalesReport = async (req, res) => {
     }
 };
 
-const downloadSalesReport = async (req, res) => {
+export const downloadSalesReport = async (req, res) => {
     try {
         const { startDate, endDate, timeFrame = 'daily', format } = req.query;
         const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 30));
@@ -607,7 +607,7 @@ const downloadSalesReport = async (req, res) => {
     }
 };
 
-const getTopSellers = async (req, res) => {
+export const getTopSellers = async (req, res) => {
     try {
         const products = await Order.aggregate([
             { $match: { status: "Delivered" } },
@@ -640,7 +640,7 @@ const getTopSellers = async (req, res) => {
     }
 };
 
-const getDetailedOrders = async (req, res) => {
+export const getDetailedOrders = async (req, res) => {
     try {
         const { startDate, endDate } = req.query;
         const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 30));
@@ -660,17 +660,4 @@ const getDetailedOrders = async (req, res) => {
         console.error("Error fetching detailed orders:", error);
         res.status(500).json({ success: false, message: "Error fetching detailed orders", error: error.message });
     }
-};
-
-module.exports = {
-    pageerror,
-    loadLogin,
-    login,
-    applyCouponToOrder,
-    loadDashboard,
-    logout,
-    getSalesReport,
-    downloadSalesReport,
-    getTopSellers,
-    getDetailedOrders
 };

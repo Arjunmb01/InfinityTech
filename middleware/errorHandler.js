@@ -1,7 +1,7 @@
-const winston = require('winston');
+import winston from 'winston';
 
 // Configure Winston logger
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
     level: 'info',
     format: winston.format.combine(
         winston.format.timestamp(),
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Central error handler middleware
-const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, next) => {
     // Log the error
     logger.error({
         message: err.message,
@@ -58,5 +58,3 @@ const errorHandler = (err, req, res, next) => {
             : err.message
     });
 };
-
-module.exports = { errorHandler, logger };

@@ -1,10 +1,10 @@
-const Offer = require('../../models/offerSchema');
-const Categories = require('../../models/categorySchema');
-const Product = require('../../models/productSchema');
-const mongoose = require('mongoose');
+import Offer from '../../models/offerSchema.js';
+import Categories from '../../models/categorySchema.js';
+import Product from '../../models/productSchema.js';
+import mongoose from 'mongoose';
 
 // Get all offers (for /admin/offers route)
-exports.getAllOffers = async (req, res) => {
+export const getAllOffers = async (req, res) => {
     try {
         const offers = await Offer.find()
             .populate('Categories', 'name')
@@ -25,7 +25,7 @@ exports.getAllOffers = async (req, res) => {
 };
 
 // Load add offer form
-exports.getAddOffer = async (req, res) => {
+export const getAddOffer = async (req, res) => {
     try {
         const categories = await Categories.find();
         const products = await Product.find();
@@ -47,7 +47,7 @@ exports.getAddOffer = async (req, res) => {
 };
 
 // Create a new offer
-exports.postAddOffer = async (req, res) => {
+export const postAddOffer = async (req, res) => {
     try {
         console.log('Request Body:', req.body); // Debug log
         const { name, description, discountType, discountValue, maxDiscount, minimumAmount, startDate, endDate, product, category, offerType } = req.body;
@@ -165,7 +165,7 @@ exports.postAddOffer = async (req, res) => {
 };
 
 // Load edit offer form
-exports.getEditOffer = async (req, res) => {
+export const getEditOffer = async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             throw new Error('Invalid offer ID');
@@ -198,7 +198,7 @@ exports.getEditOffer = async (req, res) => {
 };
 
 // Update an existing offer
-exports.postEditOffer = async (req, res) => {
+export const postEditOffer = async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             throw new Error('Invalid offer ID');
@@ -296,7 +296,7 @@ exports.postEditOffer = async (req, res) => {
 };
 
 // Toggle offer status (for /admin/offers/toggle/:id route)
-exports.toggleOfferStatus = async (req, res) => {
+export const toggleOfferStatus = async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             throw new Error('Invalid offer ID');

@@ -1,7 +1,8 @@
-const Razorpay = require('razorpay');
-require('dotenv').config();
+import Razorpay from 'razorpay';
+import dotenv from 'dotenv';
+dotenv.config();
 
-exports.createRazorpayInstance = () => {
+export const createRazorpayInstance = () => {
     try {
         if (!process.env.Test_Key_ID || !process.env.Test_Key_Secret) {
             throw new Error('Razorpay keys are not defined in environment variables');

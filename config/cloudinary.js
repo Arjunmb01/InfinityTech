@@ -1,8 +1,9 @@
 
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
-require('dotenv').config();
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -26,7 +27,7 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-const upload = multer({
+export const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, 
@@ -35,7 +36,7 @@ const upload = multer({
   { name: 'newImage', maxCount: 1 },
 ]);
 
-const handleMulterError = (err, req, res, next) => {
+export const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE')
       return res.status(400).json({ success: false, message: 'File too large (max 5MB)' });
@@ -47,4 +48,4 @@ const handleMulterError = (err, req, res, next) => {
   next(err);
 };
 
-module.exports = { cloudinary, upload, handleMulterError };
+export { cloudinary };

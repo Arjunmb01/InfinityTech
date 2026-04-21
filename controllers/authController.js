@@ -1,12 +1,12 @@
-const User = require('../models/userSchema');
-const { 
+import User from '../models/userSchema.js';
+import { 
     verifyRefreshToken, 
     generateAccessToken, 
     extractRefreshToken 
-} = require('../utils/jwt');
+} from '../utils/jwt.js';
 
 
-const refreshAccessToken = async (req, res) => {
+export const refreshAccessToken = async (req, res) => {
     try {
         const refreshToken = extractRefreshToken(req);
 
@@ -97,7 +97,7 @@ const refreshAccessToken = async (req, res) => {
 /**
  * Revoke Refresh Token (Logout from specific device)
  */
-const revokeRefreshToken = async (req, res) => {
+export const revokeRefreshToken = async (req, res) => {
     try {
         const refreshToken = extractRefreshToken(req);
 
@@ -145,7 +145,7 @@ const revokeRefreshToken = async (req, res) => {
 /**
  * Revoke All Refresh Tokens (Logout from all devices)
  */
-const revokeAllRefreshTokens = async (req, res) => {
+export const revokeAllRefreshTokens = async (req, res) => {
     try {
         const userId = req.user?._id || req.tokenPayload?._id;
 
@@ -183,7 +183,7 @@ const revokeAllRefreshTokens = async (req, res) => {
 /**
  * Verify Token Status
  */
-const verifyToken = async (req, res) => {
+export const verifyToken = async (req, res) => {
     try {
         // If middleware passed, user is authenticated
         return res.status(200).json({ 
@@ -203,11 +203,4 @@ const verifyToken = async (req, res) => {
             message: 'Internal server error' 
         });
     }
-};
-
-module.exports = {
-    refreshAccessToken,
-    revokeRefreshToken,
-    revokeAllRefreshTokens,
-    verifyToken
 };

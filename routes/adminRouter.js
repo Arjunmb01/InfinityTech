@@ -1,18 +1,18 @@
 // adminRouter.js
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const adminControllers = require('../controllers/Admin/adminController');
-const customerController = require('../controllers/Admin/customerController');
-const categoryController = require('../controllers/Admin/categoryController');
-const productController = require('../controllers/Admin/productController');
-const orderController = require('../controllers/Admin/orderControllers');
-const offerController = require('../controllers/Admin/offerController');
-const couponController = require('../controllers/Admin/couponController');
-const returnController = require('../controllers/Admin/returnOrderController');
-const bannerController = require('../controllers/Admin/bannerController');
-const { upload, handleMulterError } = require('../config/cloudinary');
-const admin = require('../middleware/adminAuth');
+import * as adminControllers from '../controllers/Admin/adminController.js';
+import * as customerController from '../controllers/Admin/customerController.js';
+import * as categoryController from '../controllers/Admin/categoryController.js';
+import * as productController from '../controllers/Admin/productController.js';
+import * as orderController from '../controllers/Admin/orderControllers.js';
+import * as offerController from '../controllers/Admin/offerController.js';
+import * as couponController from '../controllers/Admin/couponController.js';
+import * as returnController from '../controllers/Admin/returnOrderController.js';
+import * as bannerController from '../controllers/Admin/bannerController.js';
+import { upload, handleMulterError } from '../config/cloudinary.js';
+import * as admin from '../middleware/adminAuth.js';
 
 // Admin Authentication Routes
 router.get('/pageerror', adminControllers.pageerror);
@@ -99,4 +99,4 @@ router.post('/banners/edit/:id', admin.isAdmin, bannerController.updateBanner);
 router.patch('/banners/toggle/:id', admin.isAdmin, bannerController.toggleBannerStatus);
 router.delete('/banners/delete/:id', admin.isAdmin, bannerController.deleteBanner);
 
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
-const User = require('../../models/userSchema');
+import User from '../../models/userSchema.js';
 
 // Controller to fetch and display customer information
-const customerInfo = async (req, res) => {
+export const customerInfo = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 7;
@@ -64,7 +64,7 @@ const customerInfo = async (req, res) => {
 };
 
 // Controller to block/unblock a user
-const blockUser = async (req, res) => {
+export const blockUser = async (req, res) => {
     try {
         const userId = req.params.id;
         console.log(`Attempting to block/unblock user ${userId}`);
@@ -98,9 +98,4 @@ const blockUser = async (req, res) => {
             message: 'Failed to update user status' 
         });
     }
-};
-
-module.exports = {
-    customerInfo,
-    blockUser,
 };

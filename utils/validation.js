@@ -1,7 +1,8 @@
-const { body, validationResult } = require('express-validator');
+import { body, validationResult } from 'express-validator';
+import User from '../models/userSchema.js';
 
 // User validation rules
-const userValidationRules = {
+export const userValidationRules = {
     signup: [
         body('name')
             .trim()
@@ -26,7 +27,6 @@ const userValidationRules = {
                 if (req.user && req.user.email === email) {
                     return true;
                 }
-                const User = require('../models/userSchema');
                 const existingUser = await User.findOne({ email: email.toLowerCase() });
                 if (existingUser) {
                     throw new Error('Email already registered');
@@ -76,7 +76,7 @@ const userValidationRules = {
 };
 
 // Custom validation middleware
-const validate = (req, res, next) => {
+export const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         // Store old input in flash for form repopulation
@@ -91,10 +91,4 @@ const validate = (req, res, next) => {
         return res.redirect(redirectPath);
     }
     next();
-};
-
-// Export validation rules and middleware
-module.exports = {
-    userValidationRules,
-    validate
 };

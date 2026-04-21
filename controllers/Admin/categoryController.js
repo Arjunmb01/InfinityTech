@@ -1,8 +1,7 @@
-const Category = require('../../models/categorySchema');
-const Product = require('../../models/productSchema');
+import Category from '../../models/categorySchema.js';
+import Product from '../../models/productSchema.js';
 
-// Load Categories Page
-const categoryInfo = async (req, res) => {
+export const categoryInfo = async (req, res) => {
     try {
         const { page = 1, search = "", status = "", sort = "date" } = req.query;
         const perPage = 5;
@@ -27,7 +26,6 @@ const categoryInfo = async (req, res) => {
 
         const totalPages = Math.ceil(totalCategories / perPage);
 
-        // Handle AJAX requests
         if (req.query.ajax === 'true') {
             return res.json({
                 success: true,
@@ -57,8 +55,7 @@ const categoryInfo = async (req, res) => {
     }
 };
 
-// Load Add Category Page
-const loadCategory = async (req, res) => {
+export const loadCategory = async (req, res) => {
     try {
         const categories = await Category.find({ "status.isDeleted": false, "status.isActive": true });
         res.render('admin/addCategory', { categories });
@@ -68,8 +65,7 @@ const loadCategory = async (req, res) => {
     }
 };
 
-// Add New Category
-const addCategory = async (req, res) => {
+export const addCategory = async (req, res) => {
     try {
         const { 
             name, 
@@ -81,7 +77,6 @@ const addCategory = async (req, res) => {
             seo 
         } = req.body;
 
-        // Backend Validation
         if (!name || !name.trim()) {
             return res.status(400).json({ success: false, message: 'Category name is required' });
         }
@@ -90,7 +85,6 @@ const addCategory = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Category name must be at least 2 characters' });
         }
 
-        // Check for existing category (case-insensitive)
         const existingCategory = await Category.findOne({
             name: { $regex: new RegExp(`^${name.trim()}$`, 'i') },
             "status.isDeleted": false
@@ -100,7 +94,6 @@ const addCategory = async (req, res) => {
             return res.status(409).json({ success: false, message: 'Category with this name already exists' });
         }
 
-        // Calculate level based on parent
         let level = 1;
         if (parent) {
             const parentCategory = await Category.findById(parent);
@@ -109,7 +102,6 @@ const addCategory = async (req, res) => {
             }
         }
 
-        // Create new category
         const newCategory = new Category({
             name: name.trim(),
             slug: name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -142,8 +134,7 @@ const addCategory = async (req, res) => {
     }
 };
 
-// Load Edit Category Page
-const loadEditCategory = async (req, res) => {
+export const loadEditCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
 
@@ -157,11 +148,10 @@ const loadEditCategory = async (req, res) => {
             return res.redirect('/admin/categories');
         }
 
-        // Fetch all categories for parent selection
         const categories = await Category.find({ 
             "status.isDeleted": false, 
             "status.isActive": true,
-            _id: { $ne: categoryId } // Cannot be its own parent
+            _id: { $ne: categoryId } 
         });
 
         res.render('admin/editCategory', {
@@ -175,8 +165,7 @@ const loadEditCategory = async (req, res) => {
     }
 };
 
-// Update Category
-const updateCategory = async (req, res) => {
+export const updateCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
         const { 
@@ -189,12 +178,10 @@ const updateCategory = async (req, res) => {
             seo 
         } = req.body;
 
-        // Validate required fields
         if (!name || !name.trim()) {
             return res.status(400).json({ success: false, message: 'Category name is required' });
         }
 
-        // Check for existing category with same name
         const existingCategory = await Category.findOne({
             name: name.trim(),
             _id: { $ne: categoryId },
@@ -205,7 +192,6 @@ const updateCategory = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Category name already exists' });
         }
 
-        // Calculate level if parent changed
         let level = 1;
         if (parent) {
             const parentCategory = await Category.findById(parent);
@@ -250,12 +236,10 @@ const updateCategory = async (req, res) => {
     }
 };
 
-// Delete Category
-const deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
 
-        // Check if category has associated products
         const productsCount = await Product.countDocuments({
             category: categoryId,
             "status.isDeleted": false
@@ -295,12 +279,10 @@ const deleteCategory = async (req, res) => {
     }
 };
 
-// Toggle Category Status
-const toggleCategoryStatus = async (req, res) => {
+export const toggleCategoryStatus = async (req, res) => {
     try {
         const categoryId = req.params.id;
         
-        // Add validation for categoryId
         if (!categoryId) {
             return res.status(400).json({
                 success: false,
@@ -316,11 +298,9 @@ const toggleCategoryStatus = async (req, res) => {
             });
         }
 
-        // Toggle the status
         category.status.isActive = !category.status.isActive;
         await category.save();
 
-        // Set proper headers
         res.setHeader('Content-Type', 'application/json');
         
         return res.status(200).json({
@@ -342,7 +322,7 @@ const toggleCategoryStatus = async (req, res) => {
     }
 };
 
-const getCategoryDetails = async (req, res) => {
+export const getCategoryDetails = async (req, res) => {
     try {
         const categoryId = req.params.id;
         const category = await Category.findOne({
@@ -357,11 +337,10 @@ const getCategoryDetails = async (req, res) => {
             });
         }
 
-        // Fetch all categories for parent selection (optional, but helpful for editing)
         const allCategories = await Category.find({ 
             "status.isDeleted": false, 
             "status.isActive": true,
-            _id: { $ne: categoryId } // Exclude itself from being its own parent
+            _id: { $ne: categoryId } 
         });
 
         res.json({
@@ -376,15 +355,4 @@ const getCategoryDetails = async (req, res) => {
             message: 'Error fetching category details'
         });
     }
-};
-
-module.exports = {
-    categoryInfo,
-    loadCategory,
-    addCategory,
-    loadEditCategory,
-    updateCategory,
-    deleteCategory,
-    toggleCategoryStatus,
-    getCategoryDetails
 };

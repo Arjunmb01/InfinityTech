@@ -1,22 +1,23 @@
-const User = require('../../models/userSchema');
-const Product = require('../../models/productSchema');
-const Cart = require('../../models/cartSchema');
-const Address = require('../../models/addressSchema');
-const Order = require('../../models/orderSchema');
-const Coupon = require('../../models/coupounSchema');
-const Wallet = require('../../models/walletSchema');
-const emailService = require('../../services/emailService');
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+import User from '../../models/userSchema.js';
+import Product from '../../models/productSchema.js';
+import Cart from '../../models/cartSchema.js';
+import Address from '../../models/addressSchema.js';
+import Order from '../../models/orderSchema.js';
+import Coupon from '../../models/coupounSchema.js';
+import Wallet from '../../models/walletSchema.js';
+import * as emailService from '../../services/emailService.js';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
+import PDFDocument from 'pdfkit';
 
-const { getBestOfferForProduct } = require('../../utils/offer');
+import { getBestOfferForProduct } from '../../utils/offer.js';
 
 const razorpay = new Razorpay({
   key_id: process.env.Test_Key_ID,
   key_secret: process.env.Test_Key_Secret,
 });
 
-exports.renderCheckout = async (req, res) => {
+export const renderCheckout = async (req, res) => {
   try {
     const userId = req.session.user._id;
     const [cart, userAddress, coupons] = await Promise.all([
@@ -81,7 +82,7 @@ exports.renderCheckout = async (req, res) => {
   }
 };
 
-exports.applyCoupon = async (req, res) => {
+export const applyCoupon = async (req, res) => {
   try {
     const { couponCode, subtotal } = req.body;
     const userId = req.session.user._id;
@@ -121,7 +122,7 @@ exports.applyCoupon = async (req, res) => {
   }
 };
 
-exports.initiateCheckout = async (req, res) => {
+export const initiateCheckout = async (req, res) => {
   try {
     const { addressId, paymentMethod, couponCode } = req.body;
     const userId = req.session.user._id;
@@ -260,7 +261,7 @@ async function handleWalletOrder(req, res, orderData) {
   });
 }
 
-exports.createRazorpayOrder = async (req, res) => {
+export const createRazorpayOrder = async (req, res) => {
   try {
     const { amount } = req.body;
     if (!amount) {
@@ -287,7 +288,7 @@ exports.createRazorpayOrder = async (req, res) => {
   }
 };
 
-exports.verifyPayment = async (req, res) => {
+export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderData } = req.body;
     
@@ -359,7 +360,7 @@ exports.verifyPayment = async (req, res) => {
   }
 };
 
-exports.savePendingOrder = async (req, res) => {
+export const savePendingOrder = async (req, res) => {
     try {
         const { addressId, orderItems, totalAmount, couponCode, shippingCharge } = req.body;
         const userId = req.session.user._id;
@@ -394,7 +395,7 @@ exports.savePendingOrder = async (req, res) => {
     }
 };
 
-exports.retryPayment = async (req, res) => {
+export const retryPayment = async (req, res) => {
     try {
         const { orderId } = req.params;
         const order = await Order.findById(orderId);
@@ -436,7 +437,7 @@ async function sendOrderConfirmationEmail(email, order) {
   }
 }
 
-exports.downloadInvoice = async (req, res) => {
+export const downloadInvoice = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.session.user._id;
@@ -446,7 +447,6 @@ exports.downloadInvoice = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const PDFDocument = require('pdfkit');
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
         res.setHeader('Content-Type', 'application/pdf');
@@ -559,7 +559,8 @@ exports.downloadInvoice = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error generating invoice' });
     }
 };
-exports.showOrderSuccess = async (req, res) => {
+
+export const showOrderSuccess = async (req, res) => {
   try {
     const orderId = req.query.id;
     if (!orderId) return res.redirect('/orders');
@@ -576,6 +577,4 @@ exports.showOrderSuccess = async (req, res) => {
     console.error('Show order success error:', error);
     res.redirect('/orders');
   }
-};
-
-module.exports = exports;
+};rts;

@@ -1,4 +1,5 @@
-const { body, validationResult } = require('express-validator');
+import { body, validationResult } from 'express-validator';
+import Product from '../models/productSchema.js';
 
 // Validation rules for product
 const productValidationRules = [
@@ -7,7 +8,6 @@ const productValidationRules = [
         .notEmpty().withMessage('Product name is required')
         .matches(/^[a-zA-Z]/).withMessage('Product name must start with an alphabet')
         .custom(async (value, { req }) => {
-            const Product = require('../models/productSchema');
             const productId = req.params.id;
             const query = { name: value, isDeleted: false };
             
@@ -78,7 +78,7 @@ const productValidationRules = [
 ];
 
 // Middleware to validate product
-const validateProduct = async (req, res, next) => {
+export const validateProduct = async (req, res, next) => {
     try {
         // Run validation rules
         await Promise.all(productValidationRules.map(validation => validation.run(req)));
@@ -100,8 +100,4 @@ const validateProduct = async (req, res, next) => {
             message: 'An error occurred during validation'
         });
     }
-};
-
-module.exports = {
-    validateProduct
 };

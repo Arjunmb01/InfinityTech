@@ -1,12 +1,12 @@
-const Wishlist = require('../../models/wishlistSchema');
-const Product = require('../../models/productSchema');
-const mongoose = require('mongoose');
-const { getBestOfferForProduct } = require('../../utils/offer');
+import Wishlist from '../../models/wishlistSchema.js';
+import Product from '../../models/productSchema.js';
+import mongoose from 'mongoose';
+import { getBestOfferForProduct } from '../../utils/offer.js';
 
 /**
  * @desc Get User Wishlist
  */
-exports.getWishlist = async (req, res) => {
+export const getWishlist = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         if (!userId) return res.redirect('/login');
@@ -41,7 +41,7 @@ exports.getWishlist = async (req, res) => {
 /**
  * @desc Add to Wishlist
  */
-exports.addToWishlist = async (req, res) => {
+export const addToWishlist = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         const { productId } = req.body;
@@ -69,7 +69,7 @@ exports.addToWishlist = async (req, res) => {
 /**
  * @desc Remove from Wishlist
  */
-exports.removeFromWishlist = async (req, res) => {
+export const removeFromWishlist = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         const { productId } = req.params;
@@ -91,7 +91,7 @@ exports.removeFromWishlist = async (req, res) => {
 /**
  * @desc Toggle Wishlist (for UI convenience)
  */
-exports.toggleWishlist = async (req, res) => {
+export const toggleWishlist = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         const { productId } = req.body;
@@ -124,7 +124,7 @@ exports.toggleWishlist = async (req, res) => {
     }
 };
 
-exports.getWishlistProductIds = async (req, res) => {
+export const getWishlistProductIds = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         if (!userId) return res.json({ wishlistItems: [] });
@@ -136,7 +136,7 @@ exports.getWishlistProductIds = async (req, res) => {
     }
 };
 
-exports.getWishlistCount = async (req, res) => {
+export const getWishlistCount = async (req, res) => {
     try {
         const userId = req.session.user?._id;
         if (!userId) return res.json({ success: true, count: 0 });

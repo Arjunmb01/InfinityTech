@@ -1,9 +1,8 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/userSchema');
-require('dotenv').config();
-
-
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import User from '../models/userSchema.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 passport.use(
     new GoogleStrategy(
@@ -35,7 +34,6 @@ passport.use(
                         });
                     }
 
-                    // Update Google ID if not present
                     if (!user.googleId) {
                         user.googleId = googleId;
                         await user.save();
@@ -90,4 +88,4 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-module.exports = passport;
+export default passport;

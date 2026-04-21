@@ -1,19 +1,19 @@
-const User = require('../../models/userSchema');
-const bcrypt = require('bcrypt');
-const emailService = require('../../services/emailService');
+import User from '../../models/userSchema.js';
+import bcrypt from 'bcrypt';
+import * as emailService from '../../services/emailService.js';
 
 const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-exports.getForgotPasswordPage = (req, res) => {
+export const getForgotPasswordPage = (req, res) => {
     res.render('user/forgotPassword', { 
         title: 'Forgot Password',
         messages: req.flash() || { error: [], success: [] }
     });
 };
 
-exports.forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         console.log('Processing forgot password for email:', email);
@@ -57,7 +57,7 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
-exports.getVerifyOTP = async (req, res) => {
+export const getVerifyOTP = async (req, res) => {
     try {
         const { email } = req.query;
         if (!email) {
@@ -75,7 +75,7 @@ exports.getVerifyOTP = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+export const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
         console.log('Verifying OTP:', otp, 'for email:', email);
@@ -117,7 +117,7 @@ exports.verifyOTP = async (req, res) => {
     }
 };
 
-exports.getResetPassword = async (req, res) => {
+export const getResetPassword = async (req, res) => {
     try {
         const { email } = req.query;
         if (!email) {
@@ -135,7 +135,7 @@ exports.getResetPassword = async (req, res) => {
     }
 };
 
-exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -166,7 +166,7 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-exports.resendForgotOtp = async (req, res) => {
+export const resendForgotOtp = async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {

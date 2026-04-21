@@ -1,10 +1,10 @@
-const Category = require('../models/categorySchema');
-const slugify = require('slugify');
+import Category from '../models/categorySchema.js';
+import slugify from 'slugify';
 
 /**
  * @desc Create new category with slug and parent check
  */
-const createCategory = async (req, res) => {
+export const createCategory = async (req, res) => {
     try {
         const { name, description, parent, filters, seo, sortOrder, isFeatured } = req.body;
 
@@ -40,7 +40,7 @@ const createCategory = async (req, res) => {
 /**
  * @desc Get all categories in a hierarchical tree structure
  */
-const getCategories = async (req, res) => {
+export const getCategories = async (req, res) => {
     try {
         const categories = await Category.find({ "status.isDeleted": false }).sort({ sortOrder: 1 });
         
@@ -69,7 +69,7 @@ const getCategories = async (req, res) => {
 /**
  * @desc Update category and recalculate levels if parent changed
  */
-const updateCategory = async (req, res) => {
+export const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
@@ -98,7 +98,7 @@ const updateCategory = async (req, res) => {
 /**
  * @desc Soft delete category
  */
-const deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const category = await Category.findByIdAndUpdate(id, { "status.isDeleted": true, isDeleted: true }, { new: true });
@@ -108,11 +108,4 @@ const deleteCategory = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
-
-module.exports = {
-    createCategory,
-    getCategories,
-    updateCategory,
-    deleteCategory
 };

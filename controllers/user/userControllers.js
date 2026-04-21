@@ -1,17 +1,17 @@
-const User = require('../../models/userSchema');
-const bcrypt = require('bcrypt');
-const Product = require('../../models/productSchema');
-const { generateTokens } = require('../../utils/jwt');
-const emailService = require('../../services/emailService');
-const { getBestOfferForProduct } = require('../../utils/offer');
-require('dotenv').config();
-
+import User from '../../models/userSchema.js';
+import bcrypt from 'bcrypt';
+import Product from '../../models/productSchema.js';
+import { generateTokens } from '../../utils/jwt.js';
+import * as emailService from '../../services/emailService.js';
+import { getBestOfferForProduct } from '../../utils/offer.js';
+import Banner from '../../models/bannerSchema.js';
+import 'dotenv/config';
 
 const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const pageNotFound = async (req, res) => {
+export const pageNotFound = async (req, res) => {
     try {
         res.render('page-404');
     } catch (error) {
@@ -19,7 +19,7 @@ const pageNotFound = async (req, res) => {
     }
 };
 
-const loadLogin = async (req, res) => {
+export const loadLogin = async (req, res) => {
     try {
         res.render('user/login', {
             messages: req.flash() || { error: [], success: [] },
@@ -32,7 +32,7 @@ const loadLogin = async (req, res) => {
     }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -118,7 +118,7 @@ const login = async (req, res) => {
     }
 };
 
-const loadSignup = async (req, res) => {
+export const loadSignup = async (req, res) => {
     try {
         res.render('user/signup', {
             messages: req.flash() || { error: [], success: [] },
@@ -129,7 +129,7 @@ const loadSignup = async (req, res) => {
     }
 };
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
     try {
         const { name, email, phone, password, confirmPassword } = req.body;
 
@@ -211,7 +211,7 @@ const signup = async (req, res) => {
     }
 };
 
-const loadverifyOtp = async (req, res) => {
+export const loadverifyOtp = async (req, res) => {
     try {
         if (!req.session.tempUser) {
             console.error('No tempUser in session for verifyOtp page');
@@ -227,7 +227,7 @@ const loadverifyOtp = async (req, res) => {
     }
 };
 
-const verifyOtp = async (req, res) => {
+export const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
         const tempUser = req.session.tempUser;
@@ -308,7 +308,7 @@ const verifyOtp = async (req, res) => {
     }
 };
 
-const resendOtp = async (req, res) => {
+export const resendOtp = async (req, res) => {
     try {
         const tempUser = req.session.tempUser;
         if (!tempUser) {
@@ -363,7 +363,7 @@ const resendOtp = async (req, res) => {
     }
 };
 
-const logout = async (req, res) => {
+export const logout = async (req, res) => {
     try {
         // Clear JWT tokens from cookies
         res.clearCookie('accessToken');
@@ -393,7 +393,7 @@ const logout = async (req, res) => {
     }
 };
 
-const loadHomePage = async (req, res) => {
+export const loadHomePage = async (req, res) => {
     try {
         if (req.session.user) {
             const user = await User.findById(req.session.user._id);
@@ -423,7 +423,7 @@ const loadHomePage = async (req, res) => {
         const topSellingProductsData = await Product.find({
             "status.isActive": true,
             "status.isDeleted": false,
-        }).populate('category').sort({ salesCount: -1 }).limit(8).lean();
+            }).populate('category').sort({ salesCount: -1 }).limit(8).lean();
 
         const dealProductsData = await Product.find({
             "status.isActive": true,
@@ -450,7 +450,6 @@ const loadHomePage = async (req, res) => {
         ]);
 
         // Fetch active banners
-        const Banner = require('../../models/bannerSchema');
         const now = new Date();
         const activeBanners = await Banner.find({
             isActive: true,
@@ -476,7 +475,7 @@ const loadHomePage = async (req, res) => {
     }
 };
 
-const loadAboutPage = async (req, res) => {
+export const loadAboutPage = async (req, res) => {
     try {
         res.render('user/about', {
             messages: req.flash() || { error: [], success: [] },
@@ -487,7 +486,7 @@ const loadAboutPage = async (req, res) => {
     }
 };
 
-const loadContactPage = async (req, res) => {
+export const loadContactPage = async (req, res) => {
     try {
         res.render('user/contact', {
             messages: req.flash() || { error: [], success: [] },
@@ -498,7 +497,7 @@ const loadContactPage = async (req, res) => {
     }
 };
 
-const handleGoogleCallback = async (req, res) => {
+export const handleGoogleCallback = async (req, res) => {
     try {
         if (!req.user) {
             req.flash('error', 'Authentication failed. Please try again.');
@@ -565,7 +564,7 @@ const handleGoogleCallback = async (req, res) => {
 };
 
 
-const loadPassword = async (req, res) => {
+export const loadPassword = async (req, res) => {
     try {
         res.render('user/changePassword', {
             messages: req.flash() || { error: [], success: [] },
@@ -576,7 +575,7 @@ const loadPassword = async (req, res) => {
     }
 };
 
-const sendOTPForPasswordChange = async (req, res) => {
+export const sendOTPForPasswordChange = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
@@ -609,7 +608,7 @@ const sendOTPForPasswordChange = async (req, res) => {
     }
 };
 
-const changePassword = async (req, res) => {
+export const changePassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
@@ -636,23 +635,4 @@ const changePassword = async (req, res) => {
         req.flash('error', 'Server error');
         return res.redirect('/changePassword');
     }
-};
-
-module.exports = {
-    pageNotFound,
-    loadLogin,
-    loadSignup,
-    signup,
-    login,
-    logout,
-    loadverifyOtp,
-    verifyOtp,
-    resendOtp,
-    loadAboutPage,
-    loadContactPage,
-    loadHomePage,
-    changePassword,
-    loadPassword,
-    handleGoogleCallback,
-    sendOTPForPasswordChange,
 };

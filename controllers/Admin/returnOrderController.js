@@ -1,8 +1,8 @@
-const Return = require('../../models/returnSchema');
-const Order = require('../../models/orderSchema');
-const Wallet = require('../../models/walletSchema');
-const { initiateRazorpayRefund } = require('../../services/paymentService');
-const mongoose = require('mongoose');
+import Return from '../../models/returnSchema.js';
+import Order from '../../models/orderSchema.js';
+import Wallet from '../../models/walletSchema.js';
+import { initiateRazorpayRefund } from '../../services/paymentService.js';
+import mongoose from 'mongoose';
 
 // Helper function to calculate refund amount with shipping and coupon distribution
 const calculateRefundAmount = (order, items) => {
@@ -30,7 +30,7 @@ const calculateRefundAmount = (order, items) => {
 };
 
 // Get all return requests
-exports.getReturnRequests = async (req, res) => {
+export const getReturnRequests = async (req, res) => {
     try {
         const returnRequests = await Return.find()
             .populate({
@@ -68,7 +68,7 @@ exports.getReturnRequests = async (req, res) => {
 };
 
 // Get specific return request details
-exports.getReturnRequestDetails = async (req, res) => {
+export const getReturnRequestDetails = async (req, res) => {
     try {
         const returnId = req.params.id;
         const returnRequest = await Return.findById(returnId)
@@ -124,7 +124,7 @@ exports.getReturnRequestDetails = async (req, res) => {
 };
 
 // Approve return request
-exports.approveReturnRequest = async (req, res) => {
+export const approveReturnRequest = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -238,7 +238,7 @@ exports.approveReturnRequest = async (req, res) => {
 };
 
 // Reject return request
-exports.rejectReturnRequest = async (req, res) => {
+export const rejectReturnRequest = async (req, res) => {
     try {
         const returnId = req.params.id;
         console.log(`[Admin] Rejecting return request: ${returnId}`);
@@ -269,5 +269,3 @@ exports.rejectReturnRequest = async (req, res) => {
         res.status(400).json({ success: false, message: error.message || 'Failed to reject return' });
     }
 };
-
-module.exports = exports;

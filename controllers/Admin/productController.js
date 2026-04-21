@@ -1,11 +1,15 @@
-const Product = require('../../models/productSchema');
-const Category = require('../../models/categorySchema');
-const slugify = require('slugify');
-const fs = require('fs').promises;
-const path = require('path');
+import Product from '../../models/productSchema.js';
+import Category from '../../models/categorySchema.js';
+import slugify from 'slugify';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load Products Page with pagination
-const loadProduct = async (req, res) => {
+export const loadProduct = async (req, res) => {
     try {
         let page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = 7;
@@ -93,7 +97,7 @@ const loadProduct = async (req, res) => {
 };
 
 // Load Add Product Page
-const loadAddProduct = async (req, res) => {
+export const loadAddProduct = async (req, res) => {
     try {
         const categories = await Category.find({ "status.isDeleted": false, parent: null }); // Root Categories
         res.render('admin/addProduct', {
@@ -109,7 +113,7 @@ const loadAddProduct = async (req, res) => {
 };
 
 // Add New Product
-const addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
     try {
         if (!req.files || !req.files['images'] || req.files['images'].length === 0) {
             throw new Error('At least one product image is required');
@@ -184,7 +188,7 @@ const addProduct = async (req, res) => {
 };
 
 // Load Edit Product Page
-const loadEditProduct = async (req, res) => {
+export const loadEditProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
             .populate('category', 'name')
@@ -210,7 +214,7 @@ const loadEditProduct = async (req, res) => {
 };
 
 // Update Product
-const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
         const product = await Product.findById(productId);
@@ -266,7 +270,7 @@ const updateProduct = async (req, res) => {
 };
 
 // Replace Product Image
-const replaceProductImage = async (req, res) => {
+export const replaceProductImage = async (req, res) => {
     try {
         const { productId } = req.params;
         const { imageIndex } = req.body;
@@ -310,7 +314,7 @@ const replaceProductImage = async (req, res) => {
 };
 
 // Remove Product Image
-const removeProductImage = async (req, res) => {
+export const removeProductImage = async (req, res) => {
     try {
         const { productId } = req.params;
         const { imageIndex } = req.body;
@@ -352,7 +356,7 @@ const removeProductImage = async (req, res) => {
 };
 
 // Toggle Listing Status
-const toggleListStatus = async (req, res) => {
+export const toggleListStatus = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -367,7 +371,7 @@ const toggleListStatus = async (req, res) => {
 };
 
 // Toggle Featured Status
-const toggleFeaturedStatus = async (req, res) => {
+export const toggleFeaturedStatus = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -385,7 +389,7 @@ const toggleFeaturedStatus = async (req, res) => {
 };
 
 // List Product (Set isActive to true)
-const listProduct = async (req, res) => {
+export const listProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -399,7 +403,7 @@ const listProduct = async (req, res) => {
 };
 
 // Unlist Product (Set isActive to false)
-const unlistProduct = async (req, res) => {
+export const unlistProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -413,7 +417,7 @@ const unlistProduct = async (req, res) => {
 };
 
 // Soft Delete Product
-const softDeleteProduct = async (req, res) => {
+export const softDeleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -426,19 +430,4 @@ const softDeleteProduct = async (req, res) => {
         console.error('Error soft deleting product:', error);
         res.status(500).json({ success: false, message: 'Server error while soft deleting product' });
     }
-};
-
-module.exports = {
-    loadProduct,
-    loadAddProduct,
-    addProduct,
-    loadEditProduct,
-    updateProduct,
-    replaceProductImage,
-    removeProductImage,
-    toggleListStatus,
-    toggleFeaturedStatus,
-    softDeleteProduct,
-    listProduct,
-    unlistProduct
 };

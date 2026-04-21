@@ -1,7 +1,7 @@
-const Banner = require('../../models/bannerSchema');
+import Banner from '../../models/bannerSchema.js';
 
 // Get all banners
-const getAllBanners = async (req, res) => {
+export const getAllBanners = async (req, res) => {
     try {
         const banners = await Banner.find().sort({ priority: -1, createdAt: -1 }).lean();
         res.render('admin/banners', {
@@ -18,7 +18,7 @@ const getAllBanners = async (req, res) => {
 };
 
 // Get add banner form
-const getAddBanner = async (req, res) => {
+export const getAddBanner = async (req, res) => {
     try {
         res.render('admin/addBanner', {
             path: req.path,
@@ -33,7 +33,7 @@ const getAddBanner = async (req, res) => {
 };
 
 // Create new banner
-const createBanner = async (req, res) => {
+export const createBanner = async (req, res) => {
     try {
         const { title, description, link, buttonText, backgroundColor, textColor, icon, isActive, startDate, endDate, priority } = req.body;
 
@@ -65,7 +65,7 @@ const createBanner = async (req, res) => {
 };
 
 // Get edit banner form
-const getEditBanner = async (req, res) => {
+export const getEditBanner = async (req, res) => {
     try {
         const banner = await Banner.findById(req.params.id).lean();
         if (!banner) {
@@ -87,7 +87,7 @@ const getEditBanner = async (req, res) => {
 };
 
 // Update banner
-const updateBanner = async (req, res) => {
+export const updateBanner = async (req, res) => {
     try {
         const { title, description, link, buttonText, backgroundColor, textColor, icon, isActive, startDate, endDate, priority } = req.body;
 
@@ -118,7 +118,7 @@ const updateBanner = async (req, res) => {
 };
 
 // Toggle banner status
-const toggleBannerStatus = async (req, res) => {
+export const toggleBannerStatus = async (req, res) => {
     try {
         const banner = await Banner.findById(req.params.id);
         if (!banner) {
@@ -140,7 +140,7 @@ const toggleBannerStatus = async (req, res) => {
 };
 
 // Delete banner
-const deleteBanner = async (req, res) => {
+export const deleteBanner = async (req, res) => {
     try {
         const banner = await Banner.findByIdAndDelete(req.params.id);
         if (!banner) {
@@ -152,14 +152,4 @@ const deleteBanner = async (req, res) => {
         console.error('Error deleting banner:', error);
         res.status(500).json({ success: false, message: 'Error deleting banner' });
     }
-};
-
-module.exports = {
-    getAllBanners,
-    getAddBanner,
-    createBanner,
-    getEditBanner,
-    updateBanner,
-    toggleBannerStatus,
-    deleteBanner
 };

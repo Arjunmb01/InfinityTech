@@ -314,9 +314,9 @@
               color: '#e5e7eb'
             });
 
-            if (method === undefined) return; // Cancelled
-            if (method === false) refundMethod = 'wallet'; // Denied (Refund to Wallet)
-            // If confirmed, refundMethod stays 'original_source'
+            if (method === undefined) return; 
+            if (method === false) refundMethod = 'wallet'; 
+
           } else {
             const result = await Swal.fire({
               title: `Are you sure you want to ${action} this return request?`,

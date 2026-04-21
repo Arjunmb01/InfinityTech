@@ -1,9 +1,8 @@
-
-const User = require("../models/userSchema");
-const { verifyAccessToken, extractToken } = require("../utils/jwt");
+import User from "../models/userSchema.js";
+import { verifyAccessToken, extractToken } from "../utils/jwt.js";
 
 // For rendering pages - checks if JWT exists
-exports.isAuthenticated = (req, res, next) => {
+export const isAuthenticated = (req, res, next) => {
     const token = extractToken(req);
     if (token) {
         try {
@@ -23,7 +22,7 @@ exports.isAuthenticated = (req, res, next) => {
     next();
 };
 
-exports.isNotAuthenticated = (req, res, next) => {
+export const isNotAuthenticated = (req, res, next) => {
     const token = extractToken(req);
     if (token) {
         try {
@@ -43,10 +42,7 @@ exports.isNotAuthenticated = (req, res, next) => {
     next();
 };
 
-
-
-
-exports.authMiddleware = async (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
     try {
         const token = extractToken(req);
         
@@ -121,7 +117,7 @@ exports.authMiddleware = async (req, res, next) => {
     }
 };
 
-exports.auth = async (req, res, next) => {
+export const auth = async (req, res, next) => {
     try {
         const token = extractToken(req);
         

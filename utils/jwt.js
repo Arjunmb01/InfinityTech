@@ -1,16 +1,17 @@
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Token expiration times
-const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
-const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
+export const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
+export const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
 
 /**
  * Generate Access Token (short-lived)
  * @param {Object} payload - User data to encode in token
  * @returns {String} JWT access token
  */
-const generateAccessToken = (payload) => {
+export const generateAccessToken = (payload) => {
     return jwt.sign(
         payload,
         process.env.JWT_ACCESS_SECRET,
@@ -23,7 +24,7 @@ const generateAccessToken = (payload) => {
  * @param {Object} payload - User data to encode in token
  * @returns {String} JWT refresh token
  */
-const generateRefreshToken = (payload) => {
+export const generateRefreshToken = (payload) => {
     return jwt.sign(
         payload,
         process.env.JWT_REFRESH_SECRET,
@@ -37,7 +38,7 @@ const generateRefreshToken = (payload) => {
  * @returns {Object} Decoded token payload
  * @throws {Error} If token is invalid or expired
  */
-const verifyAccessToken = (token) => {
+export const verifyAccessToken = (token) => {
     try {
         return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     } catch (error) {
@@ -56,7 +57,7 @@ const verifyAccessToken = (token) => {
  * @returns {Object} Decoded token payload
  * @throws {Error} If token is invalid or expired
  */
-const verifyRefreshToken = (token) => {
+export const verifyRefreshToken = (token) => {
     try {
         return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
     } catch (error) {
@@ -74,7 +75,7 @@ const verifyRefreshToken = (token) => {
  * @param {Object} user - User object from database
  * @returns {Object} Object containing accessToken and refreshToken
  */
-const generateTokens = (user) => {
+export const generateTokens = (user) => {
     const payload = {
         _id: user._id.toString(),
         email: user.email,
@@ -94,7 +95,7 @@ const generateTokens = (user) => {
  * @param {Object} req - Express request object
  * @returns {String|null} JWT token or null
  */
-const extractToken = (req) => {
+export const extractToken = (req) => {
     // Check Authorization header (Bearer token)
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         return req.headers.authorization.substring(7);
@@ -113,7 +114,7 @@ const extractToken = (req) => {
  * @param {Object} req - Express request object
  * @returns {String|null} JWT refresh token or null
  */
-const extractRefreshToken = (req) => {
+export const extractRefreshToken = (req) => {
     // Check cookies first
     if (req.cookies && req.cookies.refreshToken) {
         return req.cookies.refreshToken;
@@ -125,16 +126,4 @@ const extractRefreshToken = (req) => {
     }
     
     return null;
-};
-
-module.exports = {
-    generateAccessToken,
-    generateRefreshToken,
-    verifyAccessToken,
-    verifyRefreshToken,
-    generateTokens,
-    extractToken,
-    extractRefreshToken,
-    ACCESS_TOKEN_EXPIRY,
-    REFRESH_TOKEN_EXPIRY
 };

@@ -1,8 +1,8 @@
-const User = require('../../models/userSchema');
-const Cart = require('../../models/cartSchema');
-const mongoose = require('mongoose');
-const Product = require('../../models/productSchema');
-const { getBestOfferForProduct } = require('../../utils/offer');
+import User from '../../models/userSchema.js';
+import Cart from '../../models/cartSchema.js';
+import mongoose from 'mongoose';
+import Product from '../../models/productSchema.js';
+import { getBestOfferForProduct } from '../../utils/offer.js';
 
 // Clean up cart function
 const cleanupCart = async (userId) => {
@@ -20,7 +20,7 @@ const cleanupCart = async (userId) => {
     }
 };
 
-const getCart = async (req, res) => {
+export const getCart = async (req, res) => {
     try {
         const userId = req.session.user._id;
         console.log('Fetching cart for user ID:', userId);
@@ -78,7 +78,7 @@ const getCart = async (req, res) => {
     }
 };
 
-const addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
     try {
         const { productId, quantity = 1, buyNow = false } = req.body;
         const userId = req.session.user?._id;
@@ -166,7 +166,7 @@ const addToCart = async (req, res) => {
     }
 };
 
-const removeFromCart = async (req, res) => {
+export const removeFromCart = async (req, res) => {
     try {
         if (!req.session.user) {
             return res.status(401).json({ success: false, message: 'Unauthorized. Please log in.' });
@@ -205,7 +205,7 @@ const removeFromCart = async (req, res) => {
     }
 };
 
-const updateCartQuantity = async (req, res) => {
+export const updateCartQuantity = async (req, res) => {
     try {
         if (!req.session.user) {
             return res.status(401).json({ success: false, message: 'Unauthorized. Please log in.' });
@@ -262,7 +262,7 @@ const updateCartQuantity = async (req, res) => {
     }
 };
 
-const getCartCount = async (req, res) => {
+export const getCartCount = async (req, res) => {
     try {
         if (!req.session.user) {
             return res.json({ success: true, count: 0 });
@@ -278,13 +278,4 @@ const getCartCount = async (req, res) => {
         console.error('Error in getCartCount:', error);
         res.status(500).json({ success: false, count: 0 });
     }
-};
-
-module.exports = {
-    getCart,
-    addToCart,
-    removeFromCart,
-    updateCartQuantity,
-    getBestOfferForProduct,
-    getCartCount
 };

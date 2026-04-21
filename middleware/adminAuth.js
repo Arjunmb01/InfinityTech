@@ -1,6 +1,6 @@
-const { verifyAccessToken, extractToken } = require("../utils/jwt");
+import { verifyAccessToken, extractToken } from "../utils/jwt.js";
 
-exports.isAdmin = async (req, res, next) => {
+export const isAdmin = async (req, res, next) => {
     try {
         const token = extractToken(req);
 
@@ -40,7 +40,7 @@ exports.isAdmin = async (req, res, next) => {
     }
 };
 
-exports.isLogout = (req, res, next) => {
+export const isLogout = (req, res, next) => {
     try {
         const token = extractToken(req);
 

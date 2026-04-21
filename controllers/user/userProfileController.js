@@ -1,8 +1,8 @@
-const { profile } = require("winston");
-const User = require("../../models/userSchema");
-const Order = require('../../models/orderSchema');
+import User from "../../models/userSchema.js";
+import Order from '../../models/orderSchema.js';
+import bcrypt from 'bcrypt';
 
-exports.loadProfile = async (req, res) => {
+export const loadProfile = async (req, res) => {
     try {
         const userId = req.user._id;
 
@@ -59,7 +59,7 @@ exports.loadProfile = async (req, res) => {
 };
 
 // Get profile edit page
-exports.getEditProfile = async (req, res) => {
+export const getEditProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const user = await User.findById(userId).lean();
@@ -154,7 +154,7 @@ const sanitizeInput = (input) => {
 };
 
 // Handle profile update
-exports.postEditProfile = async (req, res) => {
+export const postEditProfile = async (req, res) => {
     try {
         // Sanitize input
         const sanitizedInput = sanitizeInput(req.body);

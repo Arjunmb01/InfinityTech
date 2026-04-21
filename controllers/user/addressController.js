@@ -1,5 +1,5 @@
-const Address = require('../../models/addressSchema');
-const { body, validationResult } = require('express-validator');
+import Address from '../../models/addressSchema.js';
+import { body, validationResult } from 'express-validator';
 
 // Validation middleware for address fields
 const validateAddress = [
@@ -23,7 +23,7 @@ const validateAddress = [
     .matches(/^\d{10}$/).withMessage('Phone number must be exactly 10 digits')
 ];
 
-exports.getAddress = async (req, res) => {
+export const getAddress = async (req, res) => {
   try {
     const userID = req.session?.user?._id;
     if (!userID) throw new Error('User not authenticated');
@@ -53,7 +53,7 @@ exports.getAddress = async (req, res) => {
   }
 };
 
-exports.addAddress = [
+export const addAddress = [
   validateAddress,
   async (req, res) => {
     try {
@@ -117,7 +117,7 @@ exports.addAddress = [
   }
 ];
 
-exports.editAddress = async (req, res) => {
+export const editAddress = async (req, res) => {
   try {
     const userID = req.session?.user?._id;
     if (!userID) throw new Error('User not authenticated');
@@ -142,7 +142,7 @@ exports.editAddress = async (req, res) => {
   }
 };
 
-exports.updateAddress = [
+export const updateAddress = [
   validateAddress,
   async (req, res) => {
     try {
@@ -187,7 +187,7 @@ exports.updateAddress = [
   }
 ];
 
-exports.setDefaultAddress = async (req, res) => {
+export const setDefaultAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
     const userID = req.session?.user?._id;
@@ -220,7 +220,7 @@ exports.setDefaultAddress = async (req, res) => {
   }
 };
 
-exports.deleteAddress = async (req, res) => {
+export const deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
     const userID = req.session?.user?._id;

@@ -1,6 +1,7 @@
-const User = require('../models/userSchema');
-const bcrypt = require('bcrypt');
-const { generateOTP, sendOTPEmail, verifyOTP } = require('../utils/otpUtils');
+import User from '../models/userSchema.js';
+import bcrypt from 'bcrypt';
+// Note: utils/otpUtils.js seems missing in current directory, but converting syntax anyway
+import { generateOTP, sendOTPEmail, verifyOTP } from '../utils/otpUtils.js';
 
 class UserService {
     // Store temporary user data and OTPs
@@ -97,4 +98,4 @@ class UserService {
     }
 }
 
-module.exports = UserService;
+export default UserService;
