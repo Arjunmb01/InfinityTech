@@ -109,7 +109,8 @@ export const login = async (req, res) => {
         };
 
         req.flash('success', `Welcome back, ${user.name}!`);
-        return res.redirect('/');
+        const redirectUrl = process.env.CLIENT_URL || '/';
+        return res.redirect(redirectUrl);
 
     } catch (error) {
         console.error(`Login error for email ${req.body.email}:`, error);
@@ -299,7 +300,7 @@ export const verifyOtp = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: `Welcome ${newUser.name}! Your account has been created successfully`,
-            redirect: '/'
+            redirect: process.env.CLIENT_URL || '/'
         });
 
     } catch (error) {
