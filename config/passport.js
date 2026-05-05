@@ -10,7 +10,6 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback',
-            console.log("Using callback:", process.env.GOOGLE_CALLBACK_URL);
             proxy: true
         },
         async (accessToken, refreshToken, profile, done) => {
